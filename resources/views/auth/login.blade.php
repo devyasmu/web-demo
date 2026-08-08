@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Login Admin - {{ config('app.name', 'Yasmumanyar') }}</title>
-    
     <!-- Favicon -->
     @php
         $siteSettings = \App\Models\SiteSetting::first();
+        $siteName = $siteSettings->site_name ?? config('app.name', 'YASMU Manyar Gresik');
     @endphp
+    <title>Login Admin - {{ $siteName }}</title>
     @if($siteSettings && $siteSettings->favicon)
         <link rel="icon" type="image/x-icon" href="{{ asset('storage/' . $siteSettings->favicon) }}">
         <link rel="shortcut icon" type="image/x-icon" href="{{ asset('storage/' . $siteSettings->favicon) }}">

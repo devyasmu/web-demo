@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', 'Admin Panel') - {{ config('app.name', 'Laravel') }}</title>
-    
     <!-- Favicon -->
     @php
         $siteSettings = \App\Models\SiteSetting::first();
+        $siteName = $siteSettings->site_name ?? config('app.name', 'YASMU Manyar Gresik');
     @endphp
+    <title>@yield('title', 'Admin Panel') - {{ $siteName }}</title>
     @if($siteSettings && $siteSettings->favicon)
         <link rel="icon" type="image/x-icon" href="{{ asset('storage/' . $siteSettings->favicon) }}">
         <link rel="shortcut icon" type="image/x-icon" href="{{ asset('storage/' . $siteSettings->favicon) }}">
