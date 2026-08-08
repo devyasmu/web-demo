@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Tentang Kami')
+@section('title', 'Tentang Kami - ' . ($siteSettings->site_name ?? config('app.name')))
 @section('description', 'Tentang Yayasan Ma\'arif NU Hidyatus Salam - Membangun Generasi Berkarakter dan Berprestasi')
 
 @section('content')

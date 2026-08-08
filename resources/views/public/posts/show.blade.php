@@ -1,6 +1,11 @@
 @extends('layouts.public')
 
 @section('title', $post->title . ' - ' . $siteSettings->site_name)
+@section('description', $post->excerpt ?: Str::limit(strip_tags($post->content), 160))
+@section('og_type', 'article')
+@if($post->featured_image)
+    @section('og_image', Storage::url($post->featured_image))
+@endif
 
 @section('content')
 <div class="container py-5">

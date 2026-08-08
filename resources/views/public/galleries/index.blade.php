@@ -1,6 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'Galeri - ' . $siteSettings->site_name)
+@section('description', 'Galeri foto kegiatan dan dokumentasi ' . $siteSettings->site_name)
 
 @section('content')
 <div class="container py-5">

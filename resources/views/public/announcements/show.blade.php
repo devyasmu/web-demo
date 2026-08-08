@@ -1,6 +1,11 @@
 @extends('layouts.public')
 
 @section('title', $announcement->title . ' - Pengumuman - ' . $siteSettings->site_name)
+@section('description', $announcement->excerpt ?: Str::limit(strip_tags($announcement->content), 160))
+@section('og_type', 'article')
+@if($announcement->featured_image)
+    @section('og_image', Storage::url($announcement->featured_image))
+@endif
 
 @section('content')
 <div class="container py-5">

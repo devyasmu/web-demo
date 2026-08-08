@@ -1,6 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'Download - ' . $siteSettings->site_name)
+@section('description', 'Unduh dokumen dan berkas penting dari ' . $siteSettings->site_name)
 
 @section('content')
 <div class="container py-5">

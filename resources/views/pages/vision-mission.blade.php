@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Visi dan Misi')
+@section('title', 'Visi dan Misi - ' . ($siteSettings->site_name ?? config('app.name')))
 @section('description', 'Visi dan Misi Yayasan Mu\'allimin Mu\'allimat - Membangun Generasi Berkarakter dan Berprestasi')
 
 @section('content')

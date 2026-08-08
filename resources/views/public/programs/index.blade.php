@@ -1,6 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'Program - ' . $siteSettings->site_name)
+@section('description', 'Program-program pendidikan yang ditawarkan oleh ' . $siteSettings->site_name)
 
 @section('content')
 <div class="container py-5">

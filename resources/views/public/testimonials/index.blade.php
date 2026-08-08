@@ -1,6 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'Testimoni - ' . $siteSettings->site_name)
+@section('description', 'Testimoni dari wali murid dan siswa ' . $siteSettings->site_name)
 
 @section('content')
 <div class="container py-5">

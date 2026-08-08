@@ -1,6 +1,11 @@
 @extends('layouts.public')
 
 @section('title', $gallery->title . ' - Galeri - ' . $siteSettings->site_name)
+@section('description', $gallery->description ?: 'Galeri foto ' . $gallery->title . ' - ' . $siteSettings->site_name)
+@php($galleryHeroImage = $gallery->featured_image ?? $gallery->image ?? null)
+@if($galleryHeroImage)
+    @section('og_image', Storage::url($galleryHeroImage))
+@endif
 
 @section('content')
 <div class="container py-5">

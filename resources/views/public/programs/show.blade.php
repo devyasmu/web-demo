@@ -1,6 +1,10 @@
 @extends('layouts.public')
 
 @section('title', $program->title . ' - Program - ' . $siteSettings->site_name)
+@section('description', $program->excerpt ?: Str::limit(strip_tags($program->content), 160))
+@if($program->featured_image)
+    @section('og_image', Storage::url($program->featured_image))
+@endif
 
 @section('content')
 <div class="container py-5">

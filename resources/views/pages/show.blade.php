@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', $page->meta_title ?: $page->title)
+@section('title', ($page->meta_title ?: $page->title) . ' - ' . ($siteSettings->site_name ?? config('app.name')))
 @section('description', $page->meta_description ?: Str::limit(strip_tags($page->content), 160))
 
 @section('content')

@@ -1,6 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'Pengumuman - ' . $siteSettings->site_name)
+@section('description', 'Pengumuman dan informasi terbaru dari ' . $siteSettings->site_name)
 
 @section('content')
 <div class="container py-5">

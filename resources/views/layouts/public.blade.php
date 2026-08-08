@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>@yield('title', 'Yayasan Pendidikan Islam') - {{ $siteSettings->site_name ?? config('app.name', 'Laravel') }}</title>
-    
+    <title>@yield('title', $siteSettings->meta_title ?? $siteSettings->site_name ?? config('app.name', 'Laravel'))</title>
+
     <!-- Favicon -->
     @if(isset($siteSettings) && $siteSettings->favicon)
         <link rel="icon" type="image/x-icon" href="{{ asset('storage/' . $siteSettings->favicon) }}">
@@ -14,15 +14,25 @@
     @else
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
     @endif
-    
+
+    <link rel="canonical" href="@yield('canonical', url()->current())">
+
     @if(isset($siteSettings))
         <meta name="description" content="@yield('description', $siteSettings->meta_description)">
         <meta name="keywords" content="@yield('keywords', $siteSettings->meta_keywords)">
+
+        <meta property="og:site_name" content="{{ $siteSettings->site_name }}">
         <meta property="og:title" content="@yield('title', $siteSettings->meta_title)">
         <meta property="og:description" content="@yield('description', $siteSettings->meta_description)">
         <meta property="og:image" content="@yield('og_image', $siteSettings->logo ? asset('storage/' . $siteSettings->logo) : '')">
         <meta property="og:url" content="{{ url()->current() }}">
-        <meta property="og:type" content="website">
+        <meta property="og:type" content="@yield('og_type', 'website')">
+        <meta property="og:locale" content="id_ID">
+
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="@yield('title', $siteSettings->meta_title)">
+        <meta name="twitter:description" content="@yield('description', $siteSettings->meta_description)">
+        <meta name="twitter:image" content="@yield('og_image', $siteSettings->logo ? asset('storage/' . $siteSettings->logo) : '')">
     @endif
 
     <!-- Fonts -->
