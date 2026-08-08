@@ -279,14 +279,6 @@
                             <p class="card-text-modern">{{ $program->excerpt }}</p>
                         @endif
                         <div class="card-footer-modern">
-                            <div class="program-price">
-                                @if($program->price)
-                                    <span class="price-amount">Rp {{ number_format($program->price, 0, ',', '.') }}</span>
-                                    <span class="price-period">/bulan</span>
-                                @else
-                                    <span class="price-free">Gratis</span>
-                                @endif
-                            </div>
                             <a href="{{ \App\Helpers\RouteHelper::safeRouteWithMessage('programs.show', $program->slug ?? '', 'Detail program tidak tersedia') }}" class="btn-modern-card">
                                 <span>Lihat Detail</span>
                                 <i class="bi bi-arrow-right"></i>
@@ -1270,29 +1262,6 @@
     font-size: 0.9rem;
     font-weight: 600;
     margin-bottom: 1rem;
-}
-
-.program-price {
-    display: flex;
-    align-items: baseline;
-    gap: 0.25rem;
-}
-
-.price-amount {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--primary-color);
-}
-
-.price-period {
-    color: var(--section-text-color, #666);
-    font-size: 0.9rem;
-}
-
-.price-free {
-    color: var(--accent-color);
-    font-weight: 700;
-    font-size: 1.1rem;
 }
 
 .btn-modern-card {

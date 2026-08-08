@@ -66,13 +66,6 @@
                                     </span>
                                 @endif
                             </div>
-                            @if($program->price)
-                                <div class="position-absolute bottom-0 end-0 m-2">
-                                    <span class="badge bg-success fs-6">
-                                        Rp {{ number_format($program->price, 0, ',', '.') }}
-                                    </span>
-                                </div>
-                            @endif
                         </div>
                     @endif
                     

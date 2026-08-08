@@ -36,11 +36,6 @@
                                 <i class="bi bi-star-fill me-1"></i>Program Unggulan
                             </span>
                         @endif
-                        @if($program->price)
-                            <span class="badge bg-success me-2 mb-2 fs-6">
-                                Rp {{ number_format($program->price, 0, ',', '.') }}
-                            </span>
-                        @endif
                     </div>
 
                     <!-- Program Title -->
@@ -148,13 +143,6 @@
                                         <small class="text-muted">
                                             {{ $relatedProgram->created_at->format('d M Y') }}
                                         </small>
-                                        @if($relatedProgram->price)
-                                            <div class="mt-1">
-                                                <span class="badge bg-success">
-                                                    Rp {{ number_format($relatedProgram->price, 0, ',', '.') }}
-                                                </span>
-                                            </div>
-                                        @endif
                                     </div>
                                 </div>
                             </div>

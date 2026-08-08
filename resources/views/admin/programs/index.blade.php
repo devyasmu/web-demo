@@ -23,7 +23,6 @@
                                     <th>Judul</th>
                                     <th>Durasi</th>
                                     <th>Kelompok Usia</th>
-                                    <th>Harga</th>
                                     <th>Status</th>
                                     <th>Aksi</th>
                                 </tr>
@@ -45,13 +44,6 @@
                                     <td>{{ $program->title }}</td>
                                     <td>{{ $program->duration ?? '-' }}</td>
                                     <td>{{ $program->age_group ?? '-' }}</td>
-                                    <td>
-                                        @if($program->price)
-                                            Rp {{ number_format($program->price, 0, ',', '.') }}
-                                        @else
-                                            -
-                                        @endif
-                                    </td>
                                     <td>
                                         @if($program->is_active)
                                             <span class="badge bg-success">Aktif</span>

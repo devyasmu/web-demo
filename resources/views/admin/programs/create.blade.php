@@ -51,20 +51,7 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="price" class="form-label">Harga</label>
-                                <div class="input-group">
-                                    <span class="input-group-text">Rp</span>
-                                    <input type="number" class="form-control @error('price') is-invalid @enderror" 
-                                           id="price" name="price" value="{{ old('price') }}" min="0" step="1000">
-                                </div>
-                                @error('price')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="mb-3">
                                 <label for="duration" class="form-label">Durasi Program</label>
                                 <input type="text" class="form-control @error('duration') is-invalid @enderror" 
@@ -230,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function() {
             {
                 title: 'Kursus Template',
                 description: 'Template untuk kursus',
-                content: '<h2>Nama Kursus</h2><p><strong>Durasi:</strong> [Durasi]</p><p><strong>Harga:</strong> Rp [Harga]</p><h3>Deskripsi Kursus</h3><p>Deskripsi lengkap kursus...</p><h3>Materi yang Dipelajari</h3><ul><li>Materi 1</li><li>Materi 2</li></ul><h3>Target Peserta</h3><p>Siapa yang dapat mengikuti kursus ini...</p>'
+                content: '<h2>Nama Program</h2><p><strong>Durasi:</strong> [Durasi]</p><h3>Deskripsi Program</h3><p>Deskripsi lengkap program...</p><h3>Kegiatan Utama</h3><ul><li>Kegiatan 1</li><li>Kegiatan 2</li></ul><h3>Target Peserta</h3><p>Siapa yang dapat mengikuti program ini...</p>'
             }
         ],
         quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
