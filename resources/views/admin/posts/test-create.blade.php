@@ -33,8 +33,8 @@
 @endsection
 
 @push('scripts')
-<!-- TinyMCE CDN -->
-<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<!-- TinyMCE self-hosted -->
+<script src="{{ asset('vendor/tinymce/tinymce.min.js') }}"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

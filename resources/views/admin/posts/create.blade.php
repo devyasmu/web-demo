@@ -121,8 +121,8 @@
 @endsection
 
 @push('scripts')
-<!-- TinyMCE CDN with API Key -->
-<script src="https://cdn.tiny.cloud/1/{{ env('TINYMCE_API_KEY', 'no-api-key') }}/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<!-- TinyMCE self-hosted -->
+<script src="{{ asset('vendor/tinymce/tinymce.min.js') }}"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -136,8 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
             'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
             'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
             'insertdatetime', 'media', 'table', 'help', 'wordcount', 'emoticons',
-            'template', 'codesample', 'hr', 'pagebreak', 'nonbreaking', 'toc',
-            'imagetools', 'textpattern', 'noneditable', 'quickbars', 'accordion'
+            'template', 'codesample', 'pagebreak', 'nonbreaking', 'quickbars', 'accordion'
         ],
         toolbar: 'undo redo | blocks | ' +
             'bold italic backcolor | alignleft aligncenter ' +
@@ -145,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function() {
             'removeformat | help | image | link | media | table | ' +
             'code | fullscreen | preview | searchreplace | visualblocks | ' +
             'charmap | emoticons | insertdatetime | pagebreak | ' +
-            'codesample | hr | nonbreaking | toc | accordion',
+            'codesample | nonbreaking | accordion',
         content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif; font-size: 14px; }',
         image_advtab: true,
         image_upload_handler: function (blobInfo, success, failure) {
@@ -216,7 +215,7 @@ document.addEventListener('DOMContentLoaded', function() {
         ],
         quickbars_selection_toolbar: 'bold italic | quicklink h2 h3 blockquote quickimage quicktable',
         quickbars_insert_toolbar: 'quickimage quicktable',
-        contextmenu: 'link image imagetools table spellchecker configurepermanentpen',
+        contextmenu: 'link image table',
         branding: false,
         promotion: false,
         setup: function (editor) {
