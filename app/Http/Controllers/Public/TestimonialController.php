@@ -16,7 +16,7 @@ class TestimonialController extends Controller
     public function index(Request $request)
     {
         $siteSettings = SiteSetting::first();
-        $menus = MenuModel::active()->ordered()->get();
+        $menus = Menu::active()->ordered()->get();
         $runningTexts = RunningText::active()->ordered()->get();        
         $query = Testimonial::active();
         

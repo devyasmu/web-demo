@@ -76,10 +76,34 @@ Route::get('/announcements/{slug}', [AnnouncementController::class, 'show'])->na
 // Testimonial Routes
 Route::get('/testimonials', [TestimonialController::class, 'index'])->name('testimonials.index');
 
-Auth::routes();
+// Static Pages
+Route::get('/tentang-kami', [PageController::class, 'about'])->name('pages.about');
+Route::get('/vision-mission', [PageController::class, 'visionMission'])->name('pages.vision-mission');
 
-// Admin Routes
-Route::prefix('admin')->middleware(['auth'])->group(function () {
+// Indonesian URL aliases
+Route::get('/program', [ProgramController::class, 'index'])->name('program.index');
+Route::get('/berita', [PostController::class, 'index'])->name('berita.index');
+Route::get('/galeri', [GalleryController::class, 'index'])->name('galeri.index');
+Route::get('/download', [DownloadController::class, 'index'])->name('download.index');
+Route::get('/kontak', [ContactController::class, 'index'])->name('kontak.index');
+
+// Custom static pages (file fisik)
+Route::get('/contoh-halaman', function() {
+    return response()->file(public_path('contoh-halaman.html'));
+})->name('static.contoh');
+
+Route::get('/sejarah-yayasan', function() {
+    return response()->file(public_path('sejarah-yayasan.html'));
+})->name('static.sejarah');
+
+// Custom Auth Routes (hanya login dan logout) - URL tersembunyi untuk keamanan
+// URL login diubah untuk mencegah brute force dan scanning
+Route::get('/admin-access-2024', [App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/admin-access-2024', [App\Http\Controllers\Auth\LoginController::class, 'login'])->middleware('throttle:5,1');
+Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
+
+// Admin Routes - guest yang akses /admin dapat 404 (URL login harus diketik manual)
+Route::prefix('admin')->middleware(['admin.hidden', 'auth'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('admin.dashboard');
     
     // Site Settings
@@ -88,6 +112,7 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
         'update' => 'admin.site-settings.update'
     ]);
     Route::post('site-settings/reset-theme', [SiteSettingController::class, 'resetTheme'])->name('admin.site-settings.reset-theme');
+    Route::post('change-password', [SiteSettingController::class, 'changePassword'])->name('admin.change-password');
     
     // Image Upload
     Route::post('upload-image', [App\Http\Controllers\Admin\ImageUploadController::class, 'upload'])->name('upload-image');
@@ -130,6 +155,16 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
         'destroy' => 'admin.menus.destroy'
     ]);
     
+    // Quick Links (Akses Cepat)
+    Route::resource('quick-links', \App\Http\Controllers\Admin\QuickLinkController::class)->except(['show'])->names([
+        'index' => 'admin.quick-links.index',
+        'create' => 'admin.quick-links.create',
+        'store' => 'admin.quick-links.store',
+        'edit' => 'admin.quick-links.edit',
+        'update' => 'admin.quick-links.update',
+        'destroy' => 'admin.quick-links.destroy'
+    ]);
+    
     // Pages
     Route::resource('pages', AdminPageController::class)->names([
         'index' => 'admin.pages.index',
@@ -153,7 +188,9 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     ]);
     
     // Posts
-    Route::resource('admin-posts', AdminPostController::class)->names([
+    Route::resource('admin-posts', AdminPostController::class)
+        ->parameters(['admin-posts' => 'post'])
+        ->names([
         'index' => 'admin.admin-posts.index',
         'create' => 'admin.admin-posts.create',
         'store' => 'admin.admin-posts.store',
@@ -175,7 +212,10 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     ]);
     
     // Programs
-    Route::resource('admin-programs', AdminProgramController::class)->names([
+    // Use clean route parameter name so forms can pass `$program` or `$program->id`
+    Route::resource('admin-programs', AdminProgramController::class)
+        ->parameters(['admin-programs' => 'program'])
+        ->names([
         'index' => 'admin.admin-programs.index',
         'create' => 'admin.admin-programs.create',
         'store' => 'admin.admin-programs.store',
@@ -258,6 +298,27 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
         'destroy' => 'admin.contacts.destroy'
     ]);
     Route::patch('contacts/{contact}/mark-read', [AdminContactController::class, 'markAsRead'])->name('admin.contacts.mark-read');
+    
+    // Comments Management
+    Route::resource('comments', App\Http\Controllers\Admin\CommentController::class)->except(['create', 'show'])->names([
+        'index' => 'admin.comments.index',
+        'edit' => 'admin.comments.edit',
+        'update' => 'admin.comments.update',
+        'destroy' => 'admin.comments.destroy'
+    ]);
+    Route::patch('comments/{comment}/approve', [App\Http\Controllers\Admin\CommentController::class, 'approve'])->name('admin.comments.approve');
+    Route::patch('comments/{comment}/reject', [App\Http\Controllers\Admin\CommentController::class, 'reject'])->name('admin.comments.reject');
+    Route::post('comments/bulk-approve', [App\Http\Controllers\Admin\CommentController::class, 'bulkApprove'])->name('admin.comments.bulk-approve');
+    Route::post('comments/bulk-reject', [App\Http\Controllers\Admin\CommentController::class, 'bulkReject'])->name('admin.comments.bulk-reject');
+    Route::post('comments/bulk-delete', [App\Http\Controllers\Admin\CommentController::class, 'bulkDelete'])->name('admin.comments.bulk-delete');
+});
+
+// Social Features Routes
+Route::prefix('api/social')->group(function () {
+    Route::post('/like', [App\Http\Controllers\SocialController::class, 'toggleLike'])->name('social.like');
+    Route::post('/comment', [App\Http\Controllers\SocialController::class, 'storeComment'])->name('social.comment');
+    Route::get('/comments', [App\Http\Controllers\SocialController::class, 'getComments'])->name('social.comments');
+    Route::get('/check-like', [App\Http\Controllers\SocialController::class, 'checkLike'])->name('social.check-like');
 });
 
 // Static Pages Routes (must be last to avoid conflicts)

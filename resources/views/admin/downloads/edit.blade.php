@@ -11,7 +11,7 @@
                 <h5 class="card-title mb-0">Edit File Download</h5>
             </div>
             <div class="card-body">
-                <form action="{{ route('admin.downloads.update', $download->id) }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('admin.downloads.update', ['download' => $download->id]) }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     
@@ -192,7 +192,7 @@
 
 @push('scripts')
 <!-- TinyMCE CDN with API Key -->
-<script src="https://cdn.tiny.cloud/1/vrmgxblshnjy9a7bvvxr989s8oy9ntompoo73hvo4ksq8b15/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script src="https://cdn.tiny.cloud/1/{{ env('TINYMCE_API_KEY', 'no-api-key') }}/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

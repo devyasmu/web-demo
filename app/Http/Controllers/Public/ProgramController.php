@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Program;
 use App\Models\SiteSetting;
-use App\Models\Menu as MenuModel;
+use App\Models\Menu;
 use App\Models\RunningText;
 
 class ProgramController extends Controller
@@ -17,7 +17,7 @@ class ProgramController extends Controller
     public function index(Request $request)
     {
         $siteSettings = SiteSetting::first();
-        $menus = MenuModel::active()->ordered()->get();
+        $menus = Menu::active()->ordered()->get();
         $runningTexts = RunningText::active()->ordered()->get();
         
         $query = Program::active();
@@ -47,7 +47,7 @@ class ProgramController extends Controller
     public function show($slug)
     {
         $siteSettings = SiteSetting::first();
-        $menus = MenuModel::active()->ordered()->get();
+        $menus = Menu::active()->ordered()->get();
         $runningTexts = RunningText::active()->ordered()->get();
         $program = Program::active()->where('slug', $slug)->firstOrFail();
         

@@ -21,8 +21,9 @@
         <!-- Main Content -->
         <div class="col-12">
             <div class="card shadow-sm border-0 mb-4">
-                @if($gallery->featured_image)
-                    <img src="{{ Storage::url($gallery->featured_image) }}" 
+                @php($heroImage = $gallery->featured_image ?? $gallery->image ?? null)
+                @if($heroImage)
+                    <img src="{{ Storage::url($heroImage) }}" 
                          alt="{{ $gallery->title }}" 
                          class="card-img-top" style="height: 400px; object-fit: cover;">
                 @endif
@@ -32,13 +33,22 @@
                         <h1 class="display-5 fw-bold mb-0" style="color: var(--primary-color);">
                             {{ $gallery->title }}
                         </h1>
+                        @php($imagesColl = isset($images) ? $images : collect([]))
+                        @php($containsHero = $heroImage ? $imagesColl->contains($heroImage) : false)
+                        @php($imageCount = $imagesColl->count() + (($heroImage && !$containsHero) ? 1 : 0))
                         <span class="badge bg-primary fs-6">
-                            <i class="bi bi-images me-1"></i>{{ $gallery->images_count }} foto
+                            <i class="bi bi-images me-1"></i>{{ $imageCount }} foto
                         </span>
                     </div>
 
                     @if($gallery->description)
                         <p class="lead text-muted mb-4">{{ $gallery->description }}</p>
+                    @endif
+
+                    @if($gallery->content)
+                        <div class="mt-3">
+                            {!! $gallery->content !!}
+                        </div>
                     @endif
 
                     <small class="text-muted">
@@ -49,17 +59,19 @@
             </div>
 
             <!-- Gallery Images -->
-            @if($gallery->images->count() > 0)
+            @php($images = collect($gallery->images ?? []))
+            @if($images->count() > 0)
                 <div class="row" id="gallery-grid">
-                    @foreach($gallery->images as $image)
+                    @foreach($images as $image)
+                        @php($imgPath = is_array($image) ? ($image['image_path'] ?? $image['image'] ?? '') : $image)
                         <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
                             <div class="gallery-item position-relative overflow-hidden rounded shadow-sm" 
                                  style="height: 250px; cursor: pointer;"
                                  data-bs-toggle="modal" 
                                  data-bs-target="#imageModal" 
-                                 data-image="{{ Storage::url($image->image_path) }}"
+                                 data-image="{{ Storage::url($imgPath) }}"
                                  data-title="{{ $gallery->title }}">
-                                <img src="{{ Storage::url($image->image_path) }}" 
+                                <img src="{{ Storage::url($imgPath) }}" 
                                      alt="{{ $gallery->title }}" 
                                      class="w-100 h-100 object-cover">
                                 <div class="position-absolute top-0 start-0 end-0 bottom-0 d-flex align-items-center justify-content-center" 
@@ -69,6 +81,25 @@
                             </div>
                         </div>
                     @endforeach
+                </div>
+            @elseif($heroImage)
+                <div class="row" id="gallery-grid">
+                    <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                        <div class="gallery-item position-relative overflow-hidden rounded shadow-sm" 
+                             style="height: 250px; cursor: pointer;"
+                             data-bs-toggle="modal" 
+                             data-bs-target="#imageModal" 
+                             data-image="{{ Storage::url($heroImage) }}"
+                             data-title="{{ $gallery->title }}">
+                            <img src="{{ Storage::url($heroImage) }}" 
+                                 alt="{{ $gallery->title }}" 
+                                 class="w-100 h-100 object-cover">
+                            <div class="position-absolute top-0 start-0 end-0 bottom-0 d-flex align-items-center justify-content-center" 
+                                 style="background: rgba(0,0,0,0.3); opacity: 0; transition: opacity 0.3s ease;">
+                                <i class="bi bi-zoom-in text-white" style="font-size: 2rem;"></i>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             @else
                 <div class="text-center py-5">
@@ -91,13 +122,16 @@
                         <div class="col-lg-3 col-md-4 col-sm-6 mb-3">
                             <div class="card h-100 shadow-sm border-0">
                                 @if($relatedGallery->featured_image)
+                                    @php($relatedHero = $relatedGallery->featured_image ?? $relatedGallery->image ?? null)
                                     <div class="position-relative overflow-hidden" style="height: 150px;">
-                                        <img src="{{ Storage::url($relatedGallery->featured_image) }}" 
+                                        <img src="{{ Storage::url($relatedHero) }}" 
                                              alt="{{ $relatedGallery->title }}" 
                                              class="card-img-top h-100 object-cover">
                                         <div class="position-absolute top-0 end-0 m-2">
                                             <span class="badge bg-dark bg-opacity-75">
-                                                <i class="bi bi-images me-1"></i>{{ $relatedGallery->images_count }}
+                                                @php($relatedCount = ($relatedGallery->images_count ?? null))
+                                                @php($relatedCount = $relatedCount ?: ($relatedHero ? 1 : 0))
+                                                <i class="bi bi-images me-1"></i>{{ $relatedCount }}
                                             </span>
                                         </div>
                                     </div>

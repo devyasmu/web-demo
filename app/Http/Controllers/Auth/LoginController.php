@@ -25,7 +25,39 @@ class LoginController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = '/home';
+    protected $redirectTo = '/admin';
+
+    /**
+     * Redirect users after login based on intended URL or default to admin dashboard.
+     *
+     * @return string
+     */
+    protected function redirectTo()
+    {
+        $intended = session()->pull('url.intended');
+        
+        // If user was trying to access admin, redirect to admin dashboard
+        if ($intended && strpos($intended, '/admin') !== false) {
+            return '/admin';
+        }
+        
+        // Default redirect to admin dashboard
+        return '/admin';
+    }
+
+    /**
+     * Maximum number of login attempts.
+     *
+     * @var int
+     */
+    protected $maxAttempts = 5;
+
+    /**
+     * Number of minutes to lockout after max attempts.
+     *
+     * @var int
+     */
+    protected $decayMinutes = 15;
 
     /**
      * Create a new controller instance.
@@ -36,5 +68,31 @@ class LoginController extends Controller
     {
         $this->middleware('guest')->except('logout');
         $this->middleware('auth')->only('logout');
+    }
+
+    /**
+     * Get the login username to be used by the controller.
+     *
+     * @return string
+     */
+    public function username()
+    {
+        return 'email';
+    }
+
+    /**
+     * Get the failed login response instance.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    protected function sendFailedLoginResponse(\Illuminate\Http\Request $request)
+    {
+        // Don't reveal if email exists or not
+        throw \Illuminate\Validation\ValidationException::withMessages([
+            'email' => [trans('auth.failed')],
+        ]);
     }
 }

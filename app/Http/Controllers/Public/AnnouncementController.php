@@ -16,7 +16,7 @@ class AnnouncementController extends Controller
     public function index(Request $request)
     {
         $siteSettings = SiteSetting::first();
-        $menus = MenuModel::active()->ordered()->get();
+        $menus = Menu::active()->ordered()->get();
         $runningTexts = RunningText::active()->ordered()->get();        
         $query = Announcement::active()->current();
         
@@ -44,7 +44,7 @@ class AnnouncementController extends Controller
     public function show($slug)
     {
         $siteSettings = SiteSetting::first();
-        $menus = MenuModel::active()->ordered()->get();
+        $menus = Menu::active()->ordered()->get();
         $runningTexts = RunningText::active()->ordered()->get();        $announcement = Announcement::active()->where('slug', $slug)->firstOrFail();
         
         // Get related announcements

@@ -48,14 +48,18 @@
         @forelse($galleries as $gallery)
             <div class="col-lg-4 col-md-6 mb-4">
                 <div class="card h-100 shadow-sm border-0 modern-card">
-                    @if($gallery->featured_image)
+                    @php($cardImage = $gallery->featured_image ?? $gallery->image ?? null)
+                    @if($cardImage)
                         <div class="position-relative overflow-hidden" style="height: 250px;">
-                            <img src="{{ Storage::url($gallery->featured_image) }}" 
+                            <img src="{{ Storage::url($cardImage) }}" 
                                  alt="{{ $gallery->title }}" 
                                  class="card-img-top h-100 object-cover">
                             <div class="position-absolute top-0 end-0 m-2">
                                 <span class="badge bg-dark bg-opacity-75">
-                                    <i class="bi bi-images me-1"></i>{{ $gallery->images_count }} foto
+                                    @php($imgs = is_array($gallery->images ?? null) ? $gallery->images : [])
+                                    @php($containsHero = $cardImage ? in_array($cardImage, $imgs, true) : false)
+                                    @php($count = count($imgs) + (($cardImage && !$containsHero) ? 1 : 0))
+                                    <i class="bi bi-images me-1"></i>{{ $count }} foto
                                 </span>
                             </div>
                             <div class="position-absolute bottom-0 start-0 end-0 p-3" 

@@ -11,7 +11,7 @@
                 <h5 class="card-title mb-0">Edit Galeri</h5>
             </div>
             <div class="card-body">
-                <form action="{{ route('admin.galleries.update', $gallery->id) }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('admin.galleries.update', ['gallery' => $gallery->id]) }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     
@@ -76,18 +76,18 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="featured_image" class="form-label">Gambar Utama</label>
-                        @if($gallery->featured_image)
+                        <label for="image" class="form-label">Gambar Utama</label>
+                        @if($gallery->image)
                             <div class="mb-2">
-                                <img src="{{ asset('storage/' . $gallery->featured_image) }}" alt="{{ $gallery->title }}" 
+                                <img src="{{ asset('storage/' . $gallery->image) }}" alt="{{ $gallery->title }}" 
                                      class="img-thumbnail" style="max-width: 200px;">
                                 <p class="text-muted small">Gambar utama saat ini</p>
                             </div>
                         @endif
-                        <input type="file" class="form-control @error('featured_image') is-invalid @enderror" 
-                               id="featured_image" name="featured_image" accept="image/*">
+                        <input type="file" class="form-control @error('image') is-invalid @enderror" 
+                               id="image" name="image" accept="image/*">
                         <div class="form-text">Gambar utama yang akan ditampilkan sebagai thumbnail galeri.</div>
-                        @error('featured_image')
+                        @error('image')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
@@ -157,7 +157,7 @@
 
 @push('scripts')
 <!-- TinyMCE CDN with API Key -->
-<script src="https://cdn.tiny.cloud/1/vrmgxblshnjy9a7bvvxr989s8oy9ntompoo73hvo4ksq8b15/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script src="https://cdn.tiny.cloud/1/{{ env('TINYMCE_API_KEY', 'no-api-key') }}/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

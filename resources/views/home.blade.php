@@ -3,10 +3,17 @@
 @section('title', $siteSettings->site_name ?? 'Yayasan Pendidikan Islam')
 @section('description', $siteSettings->site_description ?? 'Yayasan Pendidikan Islam yang berkomitmen untuk memberikan pendidikan berkualitas dengan nilai-nilai Islam yang kuat.')
 
+@if(isset($error))
+<div class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    {{ $error }}
+</div>
+@endif
+
 @section('content')
 <!-- Modern Hero Section -->
-@if($sliders->count() > 0)
-<section class="modern-hero">
+@if($sliders && $sliders->count() > 0)
+<section class="modern-hero" style="padding-bottom: 68px;">
     <div class="hero-background">
         <div class="hero-overlay"></div>
     </div>
@@ -25,9 +32,6 @@
                     <div class="row align-items-center min-vh-100">
                         <div class="col-lg-5">
                             <div class="hero-content modern-content">
-                                <div class="hero-badge mb-3">
-                                    <span class="badge-modern">Pendidikan Berkualitas</span>
-                                </div>
                                 <h1 class="hero-title">{{ $slider->title }}</h1>
                                 @if($slider->description)
                                     <p class="hero-description">{{ $slider->description }}</p>
@@ -86,9 +90,6 @@
         <div class="row align-items-center min-vh-100">
             <div class="col-lg-5">
                 <div class="hero-content modern-content">
-                    <div class="hero-badge mb-3">
-                        <span class="badge-modern">Pendidikan Berkualitas</span>
-                    </div>
                     <h1 class="hero-title">Selamat Datang di {{ $siteSettings->site_name ?? 'Yayasan Pendidikan Islam' }}</h1>
                     <p class="hero-description">{{ $siteSettings->site_description ?? 'Membangun generasi yang berakhlak mulia dan berprestasi dengan pendidikan Islam yang terintegrasi.' }}</p>
                     <div class="hero-buttons">
@@ -118,6 +119,23 @@
 </section>
 @endif
 
+<!-- Quick Access Section (Akses Cepat) -->
+@if(isset($quickLinks) && $quickLinks->count() > 0)
+<section class="quick-access-section">
+    <div class="container">
+        <div class="quick-access-inner">
+            @foreach($quickLinks as $link)
+            <a href="{{ $link->url }}" target="_blank" rel="noopener noreferrer" class="quick-access-item">
+                <div class="quick-access-icon">
+                    <i class="{{ $link->icon }}"></i>
+                </div>
+                <span class="quick-access-title">{{ $link->title }}</span>
+            </a>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
 
 <!-- Modern Features Section -->
 <section class="modern-section features-section">
@@ -135,7 +153,7 @@
             </div>
         </div>
         <div class="row">
-            @forelse($features as $feature)
+            @forelse($features ?? collect() as $feature)
             <div class="col-lg-4 col-md-6 mb-4">
                 <div class="feature-card-modern">
                     <div class="feature-icon">
@@ -157,7 +175,7 @@
 </section>
 
 <!-- Modern Announcements Section -->
-@if($announcements->count() > 0)
+@if($announcements && $announcements->count() > 0)
 <section class="modern-section announcements-section">
     <div class="container">
         <div class="row">
@@ -189,7 +207,7 @@
                         <h5 class="card-title-modern">{{ $announcement->title }}</h5>
                         <p class="card-text-modern">{{ Str::limit(strip_tags($announcement->content), 120) }}</p>
                         <div class="card-footer-modern">
-                            <a href="{{ route('announcements.show', $announcement->slug) }}" class="btn-read-more">
+                            <a href="{{ \App\Helpers\RouteHelper::safeRouteWithMessage('announcements.show', $announcement->slug ?? '', 'Detail pengumuman tidak tersedia') }}" class="btn-read-more">
                                 <span>Baca Selengkapnya</span>
                                 <i class="bi bi-arrow-right"></i>
                             </a>
@@ -201,7 +219,7 @@
         </div>
         
         <!-- Pagination for Announcements -->
-        @if($announcements->hasPages())
+        @if($announcements && $announcements->hasPages())
         <div class="row mt-4">
             <div class="col-12">
                 <nav aria-label="Announcements pagination">
@@ -215,7 +233,7 @@
 @endif
 
 <!-- Modern Programs Section -->
-@if($featuredPrograms->count() > 0)
+@if($featuredPrograms && $featuredPrograms->count() > 0)
 <section id="programs" class="modern-section programs-section">
     <div class="container">
         <div class="row">
@@ -244,7 +262,7 @@
                         @endif
                         <div class="card-overlay">
                             <div class="overlay-content">
-                                <a href="{{ route('programs.show', $program->slug) }}" class="btn-overlay">
+                                <a href="{{ \App\Helpers\RouteHelper::safeRouteWithMessage('programs.show', $program->slug ?? '', 'Detail program tidak tersedia') }}" class="btn-overlay">
                                     <i class="bi bi-eye"></i>
                                     <span>Lihat Detail</span>
                                 </a>
@@ -269,7 +287,7 @@
                                     <span class="price-free">Gratis</span>
                                 @endif
                             </div>
-                            <a href="{{ route('programs.show', $program->slug) }}" class="btn-modern-card">
+                            <a href="{{ \App\Helpers\RouteHelper::safeRouteWithMessage('programs.show', $program->slug ?? '', 'Detail program tidak tersedia') }}" class="btn-modern-card">
                                 <span>Lihat Detail</span>
                                 <i class="bi bi-arrow-right"></i>
                             </a>
@@ -289,7 +307,7 @@
         </div>
         
         <!-- Pagination for Programs -->
-        @if($featuredPrograms->hasPages())
+        @if($featuredPrograms && $featuredPrograms->hasPages())
         <div class="row mt-4">
             <div class="col-12">
                 <nav aria-label="Programs pagination">
@@ -303,7 +321,7 @@
 @endif
 
 <!-- Modern Posts Section -->
-@if($featuredPosts->count() > 0)
+@if($featuredPosts && $featuredPosts->count() > 0)
 <section class="modern-section posts-section">
 <div class="container">
         <div class="row">
@@ -332,7 +350,7 @@
                         @endif
                         <div class="card-overlay">
                             <div class="overlay-content">
-                                <a href="{{ route('posts.show', $post->slug) }}" class="btn-overlay">
+                                <a href="{{ \App\Helpers\RouteHelper::safeRouteWithMessage('posts.show', $post->slug ?? '', 'Detail artikel tidak tersedia') }}" class="btn-overlay">
                                     <i class="bi bi-eye"></i>
                                     <span>Baca Artikel</span>
                                 </a>
@@ -351,7 +369,7 @@
                             <p class="card-text-modern">{{ $post->excerpt }}</p>
                         @endif
                         <div class="card-footer-modern">
-                            <a href="{{ route('posts.show', $post->slug) }}" class="btn-read-more">
+                            <a href="{{ \App\Helpers\RouteHelper::safeRouteWithMessage('posts.show', $post->slug ?? '', 'Detail artikel tidak tersedia') }}" class="btn-read-more">
                                 <span>Baca Selengkapnya</span>
                                 <i class="bi bi-arrow-right"></i>
                             </a>
@@ -371,7 +389,7 @@
         </div>
         
         <!-- Pagination for Posts -->
-        @if($featuredPosts->hasPages())
+        @if($featuredPosts && $featuredPosts->hasPages())
         <div class="row mt-4">
             <div class="col-12">
                 <nav aria-label="Posts pagination">
@@ -400,7 +418,7 @@
             </div>
         </div>
         <div class="row">
-            @forelse($statistics as $statistic)
+            @forelse($statistics ?? collect() as $statistic)
             <div class="col-lg-3 col-md-6 mb-4">
                 <div class="stat-card-modern">
                     <div class="stat-icon">
@@ -424,7 +442,7 @@
 </section>
 
 <!-- Modern Testimonials Section -->
-@if($testimonials->count() > 0)
+@if($testimonials && $testimonials->count() > 0)
 <section class="modern-section testimonials-section">
     <div class="container">
         <div class="row">
@@ -474,7 +492,7 @@
         </div>
         
         <!-- Pagination for Testimonials -->
-        @if($testimonials->hasPages())
+        @if($testimonials && $testimonials->hasPages())
         <div class="row mt-4">
             <div class="col-12">
                 <nav aria-label="Testimonials pagination">
@@ -516,10 +534,29 @@
             </div>
             <div class="col-lg-4">
                 <div class="cta-actions">
-                    <a href="{{ route('contacts.index') }}" class="btn btn-modern-primary-large">
-                        <i class="bi bi-telephone me-2"></i>
-                        Hubungi Kami
-                    </a>
+                    <div class="dropdown">
+                        <button class="btn btn-modern-primary-large dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-whatsapp me-2"></i>
+                            Hubungi Kami
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-cta">
+                            @php
+                                $whatsappUrl = \App\Helpers\ContactHelper::whatsappUrl($siteSettings->phone ?? null, 'Halo, saya ingin bertanya tentang program pendidikan.');
+                            @endphp
+                            @if($whatsappUrl)
+                                <li>
+                                    <a class="dropdown-item" href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer">
+                                        <i class="bi bi-whatsapp me-2"></i>Chat WhatsApp
+                                    </a>
+                                </li>
+                            @endif
+                            <li>
+                                <a class="dropdown-item" href="{{ route('contacts.index') }}">
+                                    <i class="bi bi-envelope me-2"></i>Isi Form Kontak
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -599,6 +636,7 @@
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
+    margin-bottom: 2rem;
 }
 
 .btn-modern-primary {
@@ -646,6 +684,7 @@
 .hero-image-container {
     position: relative;
     z-index: 2;
+    aspect-ratio: 16 / 9; /* keep nice ratio on desktop */
 }
 
 .hero-image {
@@ -717,6 +756,108 @@
 @keyframes float {
     0%, 100% { transform: translateY(0px); }
     50% { transform: translateY(-20px); }
+}
+
+/* Quick Access Section */
+.quick-access-section {
+    background: var(--section-bg-color, #f8f9fa);
+    padding: 1.5rem 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.quick-access-inner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.quick-access-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    background: white;
+    border-radius: 16px;
+    text-decoration: none;
+    color: var(--primary-color);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    min-width: 90px;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.quick-access-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    color: var(--primary-color);
+}
+
+.quick-access-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+}
+
+.quick-access-icon i {
+    font-size: 1.5rem;
+    color: white;
+}
+
+.quick-access-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.2;
+}
+
+@media (max-width: 576px) {
+    .quick-access-inner {
+        gap: 0.75rem;
+    }
+    .quick-access-item {
+        min-width: 75px;
+        padding: 0.75rem 1rem;
+    }
+    .quick-access-icon {
+        width: 40px;
+        height: 40px;
+    }
+    .quick-access-icon i {
+        font-size: 1.25rem;
+    }
+    .quick-access-title {
+        font-size: 0.75rem;
+    }
+}
+
+/* Mobile optimizations: avoid image cropping */
+@media (max-width: 576px) {
+    /* Give space under the sticky header so the top of the slider is visible */
+    .modern-hero { padding-top: 100px; }
+    .carousel-item .row.align-items-center.min-vh-100 {
+        min-height: auto !important;
+    }
+    .hero-image-container {
+        aspect-ratio: auto;
+    }
+    .hero-image {
+        height: auto;
+        max-height: 55vh;
+        object-fit: contain; /* keep full image visible */
+        background: #f5f7fb; /* subtle background to fill space */
+    }
+    .hero-placeholder {
+        height: 40vh;
+    }
+    .hero-title { font-size: 2rem; }
+    .hero-description { font-size: 1rem; }
+    .hero-buttons { margin-bottom: 1.5rem; }
 }
 
 /* Modern Carousel Controls */
@@ -1363,6 +1504,23 @@
     gap: 1rem;
 }
 
+.cta-actions .dropdown-menu-cta {
+    min-width: 220px;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    padding: 0.5rem;
+}
+
+.cta-actions .dropdown-menu-cta .dropdown-item {
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+}
+
+.cta-actions .dropdown-menu-cta .dropdown-item:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
 .btn-modern-primary-large {
     background: var(--button-primary-color, #ffffff);
     color: var(--button-text-color, var(--primary-color));
@@ -1482,12 +1640,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize carousel manually
     const carouselElement = document.querySelector('#heroCarousel');
     if (carouselElement) {
-        // Initialize Bootstrap carousel
-        const carousel = new bootstrap.Carousel(carouselElement, {
-            interval: 5000,
-            wrap: true,
-            touch: true
-        });
+        // Initialize Bootstrap carousel (with Bootstrap check)
+        if (typeof bootstrap !== 'undefined' && bootstrap.Carousel) {
+            const carousel = new bootstrap.Carousel(carouselElement, {
+                interval: 5000,
+                wrap: true,
+                touch: true
+            });
+        } else {
+            console.warn('Bootstrap Carousel not available');
+        }
         
         // Add touch/swipe support for mobile
         let startX = 0;

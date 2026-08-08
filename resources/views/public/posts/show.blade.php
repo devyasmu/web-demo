@@ -62,6 +62,14 @@
                         {!! $post->content !!}
                     </div>
 
+                    <!-- Social Features -->
+                    <x-social-features 
+                        :item="$post" 
+                        item-type="post" 
+                        :likes-count="$post->likes_count ?? 0" 
+                        :comments-count="$post->comments_count ?? 0" 
+                    />
+
                     <!-- Post Tags -->
                     @if($post->tags)
                         <div class="mt-4 pt-3 border-top">
@@ -208,5 +216,5 @@
     content: ">";
     color: var(--primary-color);
 }
-</style>
+
 @endsection

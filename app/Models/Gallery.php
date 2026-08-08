@@ -13,17 +13,25 @@ class Gallery extends Model
         'title',
         'slug',
         'description',
+        'content',
         'image',
+        'featured_image',
         'thumbnail',
         'type',
         'video_url',
         'category_id',
+        'event_date',
+        'location',
+        'is_featured',
         'order',
         'is_active',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'is_featured' => 'boolean',
+        'event_date' => 'date',
+        'images' => 'array',
     ];
 
     public function category()

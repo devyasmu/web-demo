@@ -44,4 +44,44 @@ class Announcement extends Model
     {
         return $query->where('priority', $priority);
     }
+
+    /**
+     * Get all of the announcement's likes.
+     */
+    public function likes()
+    {
+        return $this->morphMany(Like::class, 'likeable');
+    }
+
+    /**
+     * Get all of the announcement's comments.
+     */
+    public function comments()
+    {
+        return $this->morphMany(Comment::class, 'commentable');
+    }
+
+    /**
+     * Get approved comments for the announcement.
+     */
+    public function approvedComments()
+    {
+        return $this->comments()->approved();
+    }
+
+    /**
+     * Get likes count for the announcement.
+     */
+    public function getLikesCountAttribute()
+    {
+        return $this->likes()->count();
+    }
+
+    /**
+     * Get comments count for the announcement.
+     */
+    public function getCommentsCountAttribute()
+    {
+        return $this->approvedComments()->count();
+    }
 }

@@ -149,6 +149,13 @@
                         </li>
                         
                         <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.quick-links*') ? 'active' : '' }}" href="{{ route('admin.quick-links.index') }}">
+                                <i class="bi bi-lightning-charge"></i>
+                                Akses Cepat
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.pages*') ? 'active' : '' }}" href="{{ route('admin.pages.index') }}">
                                 <i class="bi bi-file-text"></i>
                                 Halaman
@@ -229,6 +236,19 @@
                             <a class="nav-link {{ request()->routeIs('admin.contacts*') ? 'active' : '' }}" href="{{ route('admin.contacts.index') }}">
                                 <i class="bi bi-envelope"></i>
                                 Kontak
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.comments*') ? 'active' : '' }}" href="{{ route('admin.comments.index') }}">
+                                <i class="bi bi-chat-dots"></i>
+                                Komentar
+                                @php
+                                    $pendingComments = \App\Models\Comment::where('is_approved', false)->count();
+                                @endphp
+                                @if($pendingComments > 0)
+                                    <span class="badge bg-warning ms-1">{{ $pendingComments }}</span>
+                                @endif
                             </a>
                         </li>
                         

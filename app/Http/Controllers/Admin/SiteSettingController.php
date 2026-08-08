@@ -5,7 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\SiteSetting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rules\Password;
 
 class SiteSettingController extends Controller
 {
@@ -122,7 +126,7 @@ class SiteSettingController extends Controller
         
         $siteSetting->update($data);
 
-        return redirect()->route('site-settings.index')
+        return redirect()->route('admin.site-settings.index')
             ->with('success', 'Pengaturan website berhasil diperbarui.');
     }
 
@@ -161,7 +165,39 @@ class SiteSettingController extends Controller
 
         $siteSetting->update($defaultColors);
 
-        return redirect()->route('site-settings.index')
+        return redirect()->route('admin.site-settings.index')
             ->with('success', 'Tema berhasil direset ke pengaturan default.');
+    }
+
+    /**
+     * Ubah password admin yang sedang login.
+     */
+    public function changePassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'current_password' => ['required', 'current_password'],
+            'new_password' => ['required', 'confirmed', Password::min(8)],
+        ], [
+            'current_password.required' => 'Password saat ini wajib diisi.',
+            'current_password.current_password' => 'Password saat ini salah.',
+            'new_password.required' => 'Password baru wajib diisi.',
+            'new_password.confirmed' => 'Konfirmasi password baru tidak cocok.',
+            'new_password.min' => 'Password baru minimal 8 karakter.',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->route('admin.site-settings.index')
+                ->withErrors($validator)
+                ->with('active_tab', 'password')
+                ->withInput();
+        }
+
+        $user = Auth::user();
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return redirect()->route('admin.site-settings.index')
+            ->with('success', 'Password berhasil diubah.')
+            ->with('active_tab', 'password');
     }
 }

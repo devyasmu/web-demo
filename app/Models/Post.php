@@ -55,4 +55,44 @@ class Post extends Model
     {
         return $query->where('is_published', true);
     }
+
+    /**
+     * Get all of the post's likes.
+     */
+    public function likes()
+    {
+        return $this->morphMany(Like::class, 'likeable');
+    }
+
+    /**
+     * Get all of the post's comments.
+     */
+    public function comments()
+    {
+        return $this->morphMany(Comment::class, 'commentable');
+    }
+
+    /**
+     * Get approved comments for the post.
+     */
+    public function approvedComments()
+    {
+        return $this->comments()->approved();
+    }
+
+    /**
+     * Get likes count for the post.
+     */
+    public function getLikesCountAttribute()
+    {
+        return $this->likes()->count();
+    }
+
+    /**
+     * Get comments count for the post.
+     */
+    public function getCommentsCountAttribute()
+    {
+        return $this->approvedComments()->count();
+    }
 }

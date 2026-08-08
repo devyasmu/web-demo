@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Download;
 use App\Models\SiteSetting;
-use App\Models\Menu as MenuModel;
+use App\Models\Menu;
 use App\Models\RunningText;
 use Illuminate\Support\Facades\Storage;
 
@@ -18,7 +18,7 @@ class DownloadController extends Controller
     public function index(Request $request)
     {
         $siteSettings = SiteSetting::first();
-        $menus = MenuModel::active()->ordered()->get();
+        $menus = Menu::active()->ordered()->get();
         $runningTexts = RunningText::active()->ordered()->get();        
         $query = Download::where('is_active', true);
         

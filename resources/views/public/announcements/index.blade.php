@@ -77,7 +77,7 @@
                                             @endif
                                             <small class="text-muted">
                                                 <i class="bi bi-calendar3 me-1"></i>
-                                                {{ $announcement->published_at->format('d F Y') }}
+                                                {{ $announcement->published_at ? \Carbon\Carbon::parse($announcement->published_at)->translatedFormat('d F Y') : '-' }}
                                             </small>
                                         </div>
                                         
@@ -103,7 +103,7 @@
                                             </a>
                                             <small class="text-muted">
                                                 <i class="bi bi-clock me-1"></i>
-                                                {{ $announcement->published_at->format('H:i') }}
+                                                {{ $announcement->published_at ? \Carbon\Carbon::parse($announcement->published_at)->format('H:i') : '-' }}
                                             </small>
                                         </div>
                                     </div>

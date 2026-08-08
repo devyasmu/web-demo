@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Contact;
 use App\Models\SiteSetting;
-use App\Models\Menu as MenuModel;
+use App\Models\Menu;
 use App\Models\RunningText;
 use Illuminate\Support\Facades\Mail;
 
@@ -18,7 +18,7 @@ class ContactController extends Controller
     public function index()
     {
         $siteSettings = SiteSetting::first();
-        $menus = MenuModel::active()->ordered()->get();
+        $menus = Menu::active()->ordered()->get();
         $runningTexts = RunningText::active()->ordered()->get();        
         return view('public.contacts.index', compact('siteSettings', "menus", "runningTexts"));
     }

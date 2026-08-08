@@ -28,6 +28,11 @@
                             <i class="bi bi-gear-fill"></i> Warna Admin
                         </button>
                     </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="password-tab" data-bs-toggle="tab" data-bs-target="#password" type="button" role="tab">
+                            <i class="bi bi-key"></i> Ubah Password
+                        </button>
+                    </li>
                 </ul>
 
                 <form action="{{ route('admin.site-settings.update', $siteSetting) }}" method="POST" enctype="multipart/form-data">
@@ -81,8 +86,14 @@
                                         @if($siteSetting->logo)
                                             <div class="mt-2">
                                                 <small class="text-muted">Logo saat ini:</small><br>
-                                                <img src="{{ asset('storage/' . $siteSetting->logo) }}" alt="Current Logo" 
-                                                     class="img-thumbnail" style="max-width: 150px; max-height: 80px;">
+                                                <img src="{{ \App\Helpers\AssetHelper::safeAsset($siteSetting->logo) }}" alt="Current Logo" 
+                                                     class="img-thumbnail" style="max-width: 150px; max-height: 80px;"
+                                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                                <div style="display: none; padding: 10px; border: 1px dashed #ccc; text-align: center; color: #666;">
+                                                    <i class="bi bi-image"></i><br>
+                                                    <small>Logo tidak dapat dimuat</small><br>
+                                                    <small>Path: {{ $siteSetting->logo }}</small>
+                                                </div>
                                             </div>
                                         @endif
                                     </div>
@@ -98,8 +109,14 @@
                                         @if($siteSetting->favicon)
                                             <div class="mt-2">
                                                 <small class="text-muted">Favicon saat ini:</small><br>
-                                                <img src="{{ asset('storage/' . $siteSetting->favicon) }}" alt="Current Favicon" 
-                                                     class="img-thumbnail" style="max-width: 32px; max-height: 32px;">
+                                                <img src="{{ \App\Helpers\AssetHelper::safeAsset($siteSetting->favicon) }}" alt="Current Favicon" 
+                                                     class="img-thumbnail" style="max-width: 32px; max-height: 32px;"
+                                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                                <div style="display: none; padding: 10px; border: 1px dashed #ccc; text-align: center; color: #666;">
+                                                    <i class="bi bi-image"></i><br>
+                                                    <small>Favicon tidak dapat dimuat</small><br>
+                                                    <small>Path: {{ $siteSetting->favicon }}</small>
+                                                </div>
                                             </div>
                                         @endif
                                     </div>
@@ -824,13 +841,56 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Ubah Password Tab (form terpisah via form="password-form") -->
+                        <div class="tab-pane fade" id="password" role="tabpanel">
+                            <h6 class="mb-3"><i class="bi bi-key"></i> Ubah Password Admin</h6>
+                            <p class="text-muted small mb-4">Gunakan form di bawah untuk mengubah password akun Anda. Password baru minimal 8 karakter.</p>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="current_password" class="form-label">Password Saat Ini <span class="text-danger">*</span></label>
+                                        <input type="password" class="form-control @error('current_password') is-invalid @enderror" 
+                                               id="current_password" name="current_password" form="password-form" required autocomplete="current-password"
+                                               placeholder="Masukkan password saat ini">
+                                        @error('current_password')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="new_password" class="form-label">Password Baru <span class="text-danger">*</span></label>
+                                        <input type="password" class="form-control @error('new_password') is-invalid @enderror" 
+                                               id="new_password" name="new_password" form="password-form" required minlength="8" autocomplete="new-password"
+                                               placeholder="Minimal 8 karakter">
+                                        @error('new_password')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="new_password_confirmation" class="form-label">Konfirmasi Password Baru <span class="text-danger">*</span></label>
+                                        <input type="password" class="form-control" id="new_password_confirmation" 
+                                               name="new_password_confirmation" form="password-form" required minlength="8" autocomplete="new-password"
+                                               placeholder="Ulangi password baru">
+                                    </div>
+                                    <button type="submit" form="password-form" class="btn btn-primary">
+                                        <i class="bi bi-key-fill"></i> Simpan Password
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="d-flex justify-content-end">
-                        <button type="submit" class="btn btn-primary">
+                    <div class="d-flex justify-content-end mt-3">
+                        <button type="submit" class="btn btn-primary" id="save-settings-btn">
                             <i class="bi bi-save"></i> Simpan Pengaturan
                         </button>
                     </div>
+                </form>
+
+                <!-- Form ubah password (terpisah, inputs di tab pakai form="password-form") -->
+                <form id="password-form" action="{{ route('admin.change-password') }}" method="POST" class="d-none">
+                    @csrf
                 </form>
             </div>
         </div>
@@ -841,6 +901,18 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Aktifkan tab Ubah Password jika redirect dari form ubah password
+    @if(session('active_tab') === 'password')
+    (function() {
+        const passwordTab = document.querySelector('#password-tab');
+        const passwordPane = document.querySelector('#password');
+        if (passwordTab && passwordPane) {
+            const tab = new bootstrap.Tab(passwordTab);
+            tab.show();
+        }
+    })();
+    @endif
+
     // Sync color picker with text input
     const colorInputs = document.querySelectorAll('input[type="color"]');
     colorInputs.forEach(function(colorInput) {

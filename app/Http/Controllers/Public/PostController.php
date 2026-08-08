@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Models\Category;
 use App\Models\SiteSetting;
-use App\Models\Menu as MenuModel;
+use App\Models\Menu;
 use App\Models\RunningText;
 
 class PostController extends Controller
@@ -18,7 +18,7 @@ class PostController extends Controller
     public function index(Request $request)
     {
         $siteSettings = SiteSetting::first();
-        $menus = MenuModel::active()->ordered()->get();
+        $menus = Menu::active()->ordered()->get();
         $runningTexts = RunningText::active()->ordered()->get();
         $categories = Category::all();
         
@@ -49,9 +49,9 @@ class PostController extends Controller
     public function show($slug)
     {
         $siteSettings = SiteSetting::first();
-        $menus = MenuModel::active()->ordered()->get();
+        $menus = Menu::active()->ordered()->get();
         $runningTexts = RunningText::active()->ordered()->get();
-        $post = Post::where('is_published', true)->where('slug', $slug)->with('category')->firstOrFail();
+        $post = Post::where('is_published', true)->where('slug', $slug)->with(['category', 'approvedComments'])->firstOrFail();
         
         // Get related posts (same category)
         $relatedPosts = Post::where('is_published', true)

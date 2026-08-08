@@ -45,11 +45,11 @@
                         @endif
                         <small class="text-muted me-3 mb-2">
                             <i class="bi bi-calendar3 me-1"></i>
-                            {{ $announcement->published_at->format('d F Y') }}
+                            {{ $announcement->published_at ? \Carbon\Carbon::parse($announcement->published_at)->translatedFormat('d F Y') : '-' }}
                         </small>
                         <small class="text-muted mb-2">
                             <i class="bi bi-clock me-1"></i>
-                            {{ $announcement->published_at->format('H:i') }}
+                            {{ $announcement->published_at ? \Carbon\Carbon::parse($announcement->published_at)->format('H:i') : '-' }}
                         </small>
                     </div>
 
@@ -72,6 +72,14 @@
                     <div class="announcement-content">
                         {!! $announcement->content !!}
                     </div>
+
+                    <!-- Social Features -->
+                    <x-social-features 
+                        :item="$announcement" 
+                        item-type="announcement" 
+                        :likes-count="$announcement->likes_count ?? 0" 
+                        :comments-count="$announcement->comments_count ?? 0" 
+                    />
 
                     <!-- Announcement Tags -->
                     @if($announcement->tags)
@@ -121,7 +129,7 @@
                                                 <span class="badge bg-info me-2" style="font-size: 0.7rem;">Rendah</span>
                                             @endif
                                             <small class="text-muted">
-                                                {{ $relatedAnnouncement->published_at->format('d M Y') }}
+                                                {{ $relatedAnnouncement->published_at ? \Carbon\Carbon::parse($relatedAnnouncement->published_at)->translatedFormat('d M Y') : '-' }}
                                             </small>
                                         </div>
                                     </div>
@@ -201,5 +209,5 @@
     content: ">";
     color: var(--primary-color);
 }
-</style>
+
 @endsection

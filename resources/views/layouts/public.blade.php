@@ -129,6 +129,13 @@
             }
         }
         
+        /* Navbar Styling - Ensure solid background */
+        .navbar {
+            background-color: var(--header-bg-color) !important;
+            opacity: 1 !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
         .navbar-brand {
             font-weight: 700;
             font-size: 1.5rem;
@@ -341,12 +348,12 @@
         
         /* Date and Time Display Styles */
         .datetime-display {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            font-size: 0.85rem;
-            line-height: 1.2;
-            min-width: 200px;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: flex-end !important;
+            font-size: 0.85rem !important;
+            line-height: 1.2 !important;
+            min-width: 200px !important;
         }
         
         .datetime-main, .datetime-time, .datetime-hijri {
@@ -410,6 +417,75 @@
                 margin-right: 0.5rem;
             }
         }
+        
+        /* Scroll to Top - Mobile & Desktop */
+        .scroll-to-top-btn {
+            display: none;
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: var(--primary-color);
+            color: white;
+            font-size: 1.25rem;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            transition: opacity 0.3s, transform 0.2s;
+            z-index: 1040;
+            align-items: center;
+            justify-content: center;
+            /* Mobile: above bottom nav */
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        @media (min-width: 768px) {
+            .scroll-to-top-btn {
+                /* Desktop: bottom-right corner */
+                bottom: 24px;
+                right: 24px;
+                left: auto;
+                transform: none;
+                width: 44px;
+                height: 44px;
+                font-size: 1.35rem;
+            }
+        }
+        
+        .scroll-to-top-btn.visible {
+            display: flex;
+        }
+        
+        .scroll-to-top-btn:active {
+            transform: translateX(-50%) scale(0.95);
+        }
+        
+        @media (min-width: 768px) {
+            .scroll-to-top-btn:active {
+                transform: scale(0.95);
+            }
+        }
+        
+        /* Bottom mobile wrapper */
+        .bottom-mobile-wrapper {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1030;
+        }
+        
+        .bottom-mobile-nav {
+            background: #fff;
+            border-top: 1px solid #eaeaea;
+        }
+        
+        .bottom-mobile-nav .d-flex {
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
     </style>
     
     @stack('styles')
@@ -444,9 +520,13 @@
                 {{ $siteSettings->site_name ?? config('app.name', 'Laravel') }}
             </a>
             
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation" style="border: 2px solid #000; background-color: rgba(255, 255, 255, 0.9); box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                <span class="navbar-toggler-icon" style="background-image: url('data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 30 30\'%3e%3cpath stroke=\'%23000\' stroke-linecap=\'round\' stroke-miterlimit=\'10\' stroke-width=\'2\' d=\'M4 7h22M4 15h22M4 23h22\'/%3e%3c/svg%3e');"></span>
-            </button>
+            <!-- Replace hamburger with compact date/time on small screens -->
+            <div class="d-md-none d-block ms-auto" style="color: var(--header-text-color);">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="d-flex align-items-center"><i class="bi bi-calendar3 me-1"></i><span id="current-date"></span></div>
+                    <div class="d-flex align-items-center"><i class="bi bi-clock me-1"></i><span id="current-time"></span></div>
+                </div>
+            </div>
             
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
@@ -496,19 +576,19 @@
                 
                 <ul class="navbar-nav">
                     <!-- Date and Time Display -->
-                    <li class="nav-item">
+                    <li class="nav-item d-none d-lg-block">
                         <div class="datetime-display" style="color: var(--header-text-color);">
                             <div class="datetime-main">
                                 <i class="bi bi-calendar3 me-1"></i>
-                                <span id="current-date"></span>
+                                <span id="desktop-current-date">{{ \Carbon\Carbon::now('Asia/Jakarta')->translatedFormat('l, d F Y') }}</span>
                             </div>
                             <div class="datetime-time">
                                 <i class="bi bi-clock me-1"></i>
-                                <span id="current-time"></span>
+                                <span id="desktop-current-time">{{ \Carbon\Carbon::now('Asia/Jakarta')->format('H:i') }}</span>
                             </div>
                             <div class="datetime-hijri">
                                 <i class="bi bi-moon-stars me-1"></i>
-                                <span id="hijri-date"></span>
+                                <span id="desktop-hijri-date">{{ \Carbon\Carbon::now('Asia/Jakarta')->locale('id')->isoFormat('D MMMM Y', 'Do MMMM YYYY') . ' H' }}</span>
                             </div>
                         </div>
                     </li>
@@ -518,9 +598,52 @@
     </nav>
 
     <!-- Main Content -->
-    <main>
+    <main style="padding-bottom: 72px;"> <!-- space for bottom mobile nav -->
         @yield('content')
     </main>
+
+    <!-- Scroll to Top (mobile + desktop) -->
+    <button type="button" id="scrollToTopBtn" class="scroll-to-top-btn" aria-label="Scroll ke atas" title="Scroll ke atas">
+        <i class="bi bi-chevron-up"></i>
+    </button>
+
+    <!-- Bottom Mobile Nav (mobile only) -->
+    <div class="d-md-none bottom-mobile-wrapper">
+        <nav class="bottom-mobile-nav">
+        <div class="container px-0">
+            <div class="d-flex flex-nowrap overflow-auto text-center" style="-webkit-overflow-scrolling: touch; scrollbar-width: none;">
+                <a href="{{ route('home') }}" class="flex-fill py-2 text-decoration-none" style="color: var(--primary-color);">
+                    <i class="bi bi-house-door" style="font-size: 1.2rem;"></i>
+                    <div style="font-size: 0.75rem;">Beranda</div>
+                </a>
+                <a href="{{ route('pages.about') }}" class="flex-fill py-2 text-decoration-none" style="color: var(--primary-color);">
+                    <i class="bi bi-info-circle" style="font-size: 1.2rem;"></i>
+                    <div style="font-size: 0.75rem;">Tentang</div>
+                </a>
+                <a href="{{ route('programs.index') }}" class="flex-fill py-2 text-decoration-none" style="color: var(--primary-color);">
+                    <i class="bi bi-journal-richtext" style="font-size: 1.2rem;"></i>
+                    <div style="font-size: 0.75rem;">Program</div>
+                </a>
+                <a href="{{ route('posts.index') }}" class="flex-fill py-2 text-decoration-none" style="color: var(--primary-color);">
+                    <i class="bi bi-newspaper" style="font-size: 1.2rem;"></i>
+                    <div style="font-size: 0.75rem;">Berita</div>
+                </a>
+                <a href="{{ route('galleries.index') }}" class="flex-fill py-2 text-decoration-none" style="color: var(--primary-color);">
+                    <i class="bi bi-images" style="font-size: 1.2rem;"></i>
+                    <div style="font-size: 0.75rem;">Galeri</div>
+                </a>
+                <a href="{{ route('downloads.index') }}" class="flex-fill py-2 text-decoration-none" style="color: var(--primary-color);">
+                    <i class="bi bi-download" style="font-size: 1.2rem;"></i>
+                    <div style="font-size: 0.75rem;">Download</div>
+                </a>
+                <a href="{{ route('contacts.index') }}" class="flex-fill py-2 text-decoration-none" style="color: var(--primary-color);">
+                    <i class="bi bi-envelope" style="font-size: 1.2rem;"></i>
+                    <div style="font-size: 0.75rem;">Kontak</div>
+                </a>
+            </div>
+        </div>
+        </nav>
+    </div>
 
     <!-- Footer -->
     <footer class="footer">
@@ -547,16 +670,6 @@
                     @endif
                 </div>
                 
-                <div class="col-lg-2 col-md-6 mb-4">
-                    <h6 class="mb-3">Menu</h6>
-                    <ul class="list-unstyled">
-                        @if(isset($menus))
-                            @foreach($menus->whereNull('parent_id')->sortBy('order')->take(5) as $menu)
-                                <li class="mb-2"><a href="{{ $menu->url }}">{{ $menu->title }}</a></li>
-                            @endforeach
-                        @endif
-                    </ul>
-                </div>
                 
                 <div class="col-lg-3 col-md-6 mb-4">
                     <h6 class="mb-3">Kontak</h6>
@@ -606,7 +719,9 @@
     </form>
 
     <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" 
+            onerror="console.error('Bootstrap failed to load')"
+            onload="console.log('Bootstrap loaded successfully')"></script>
     
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
@@ -614,12 +729,49 @@
     <!-- Navbar Responsive Script -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Ensure Bootstrap dropdowns work
-            var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+            // Wait for Bootstrap to load with timeout
+            let bootstrapCheckCount = 0;
+            const maxBootstrapChecks = 50; // 5 seconds max wait
             
-            var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
-                return new bootstrap.Dropdown(dropdownToggleEl);
-            });
+            function initializeBootstrap() {
+                if (typeof bootstrap !== 'undefined' && bootstrap.Dropdown) {
+                    try {
+                        var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
+                        
+                        var dropdownList = dropdownElementList.map(function (dropdownToggleEl) {
+                            return new bootstrap.Dropdown(dropdownToggleEl);
+                        });
+                        console.log('Bootstrap dropdowns initialized successfully');
+                    } catch (e) {
+                        console.warn('Bootstrap dropdown initialization failed:', e);
+                    }
+                } else if (bootstrapCheckCount < maxBootstrapChecks) {
+                    bootstrapCheckCount++;
+                    setTimeout(initializeBootstrap, 100);
+                } else {
+                    console.warn('Bootstrap not available after timeout');
+                }
+            }
+            
+            // Start Bootstrap initialization
+            initializeBootstrap();
+            
+            // Fallback: Simple dropdown functionality if Bootstrap fails
+            setTimeout(function() {
+                if (typeof bootstrap === 'undefined') {
+                    console.warn('Bootstrap not available, using fallback dropdown');
+                    // Simple dropdown fallback
+                    document.querySelectorAll('.dropdown-toggle').forEach(function(toggle) {
+                        toggle.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            const menu = this.nextElementSibling;
+                            if (menu && menu.classList.contains('dropdown-menu')) {
+                                menu.classList.toggle('show');
+                            }
+                        });
+                    });
+                }
+            }, 2000);
             
             // Navbar collapse functionality
             const navbarToggler = document.querySelector('.navbar-toggler');
@@ -634,10 +786,15 @@
                 document.addEventListener('click', function(event) {
                     const isClickInsideNav = navbarCollapse.contains(event.target) || navbarToggler.contains(event.target);
                     if (!isClickInsideNav && navbarCollapse.classList.contains('show')) {
-                        const bsCollapse = new bootstrap.Collapse(navbarCollapse, {
-                            toggle: false
-                        });
-                        bsCollapse.hide();
+                        if (typeof bootstrap !== 'undefined' && bootstrap.Collapse) {
+                            const bsCollapse = new bootstrap.Collapse(navbarCollapse, {
+                                toggle: false
+                            });
+                            bsCollapse.hide();
+                        } else {
+                            // Fallback: simple hide
+                            navbarCollapse.classList.remove('show');
+                        }
                     }
                 });
             }
@@ -690,7 +847,32 @@
                 });
             }
             
+            // Scroll to Top button (mobile)
+            const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+            if (scrollToTopBtn) {
+                window.addEventListener('scroll', function() {
+                    if (window.scrollY > 300) {
+                        scrollToTopBtn.classList.add('visible');
+                    } else {
+                        scrollToTopBtn.classList.remove('visible');
+                    }
+                });
+                scrollToTopBtn.addEventListener('click', function() {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            }
+            
             // Date and Time Display Functions
+            // cache untuk hijri agar tidak memanggil API setiap detik
+            let lastHijriDateKey = null;
+            let lastHijriText = null;
+
+            // Force update datetime on page load
+            function forceUpdateDateTime() {
+                updateDateTime();
+                updateHijriDate(new Date());
+            }
+
             function updateDateTime() {
                 const now = new Date();
                 
@@ -715,7 +897,7 @@
                 const dateFormatter = new Intl.DateTimeFormat('id-ID', dateOptions);
                 const timeFormatter = new Intl.DateTimeFormat('id-ID', timeOptions);
                 
-                // Update tanggal dan waktu
+                // Update tanggal dan waktu untuk mobile
                 const currentDateElement = document.getElementById('current-date');
                 const currentTimeElement = document.getElementById('current-time');
                 
@@ -727,50 +909,50 @@
                     currentTimeElement.textContent = timeFormatter.format(now);
                 }
                 
-                // Konversi ke kalender Hijriyah
-                updateHijriDate(now);
+                // Update tanggal dan waktu untuk desktop
+                const desktopDateElement = document.getElementById('desktop-current-date');
+                const desktopTimeElement = document.getElementById('desktop-current-time');
+                
+                if (desktopDateElement) {
+                    desktopDateElement.textContent = dateFormatter.format(now);
+                }
+                
+                if (desktopTimeElement) {
+                    desktopTimeElement.textContent = timeFormatter.format(now);
+                }
+                
+                // Konversi ke kalender Hijriyah (panggil hanya saat tanggal berubah)
+                const key = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2,'0')}-${now.getDate().toString().padStart(2,'0')}`;
+                if (lastHijriDateKey !== key) {
+                    lastHijriDateKey = key;
+                    updateHijriDate(now);
+                } else if (lastHijriText) {
+                    const hijriDateElement = document.getElementById('hijri-date');
+                    if (hijriDateElement) hijriDateElement.textContent = lastHijriText;
+                }
             }
             
             function updateHijriDate(gregorianDate) {
                 // Menggunakan API eksternal untuk konversi yang akurat
                 const hijriDateElement = document.getElementById('hijri-date');
+                const desktopHijriElement = document.getElementById('desktop-hijri-date');
                 
                 if (hijriDateElement) {
                     // Gunakan API eksternal untuk konversi yang akurat
                     fetchHijriDate(gregorianDate, hijriDateElement);
                 }
+                
+                if (desktopHijriElement) {
+                    // Update desktop hijri date juga
+                    fetchHijriDate(gregorianDate, desktopHijriElement);
+                }
             }
             
             function fetchHijriDate(gregorianDate, element) {
-                // Menggunakan API dari IslamicFinder atau sumber terpercaya
-                const year = gregorianDate.getFullYear();
-                const month = gregorianDate.getMonth() + 1;
-                const day = gregorianDate.getDate();
-                
-                // Format tanggal untuk API
-                const dateString = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-                
-                // Menggunakan API dari IslamicFinder atau alternatif
-                fetch(`https://api.aladhan.com/v1/gToH/${dateString}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.code === 200 && data.data) {
-                            const hijri = data.data.hijri;
-                            const hijriDay = hijri.day;
-                            const hijriMonth = hijri.month.en;
-                            const hijriYear = hijri.year;
-                            
-                            element.textContent = `${hijriDay} ${hijriMonth} ${hijriYear} H`;
-                        } else {
-                            // Fallback ke konversi manual jika API gagal
-                            element.textContent = convertToHijriManual(gregorianDate);
-                        }
-                    })
-                    .catch(error => {
-                        console.log('API error, using fallback:', error);
-                        // Fallback ke konversi manual jika API gagal
-                        element.textContent = convertToHijriManual(gregorianDate);
-                    });
+                // Nonaktifkan total pemanggilan API eksternal agar tidak ada 404 di console
+                // Gunakan fallback konversi manual saja
+                lastHijriText = convertToHijriManual(gregorianDate);
+                element.textContent = lastHijriText;
             }
             
             function convertToHijriManual(gregorianDate) {
@@ -822,8 +1004,10 @@
                 return `${finalDay} ${hijriMonthName} ${Math.floor(hijriYear)} H`;
             }
             
+            // Force update datetime on page load
+            forceUpdateDateTime();
+            
             // Update waktu setiap detik
-            updateDateTime();
             setInterval(updateDateTime, 1000);
         });
     </script>

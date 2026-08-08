@@ -13,7 +13,7 @@ class PostController extends Controller
     public function index()
     {
         $posts = \App\Models\Post::with('category', 'user')->latest()->get();
-        return view('admin.posts.index', compact('posts'));
+        return view('admin.admin-posts.index', compact('posts'));
     }
 
     /**
@@ -22,7 +22,7 @@ class PostController extends Controller
     public function create()
     {
         $categories = \App\Models\Category::all();
-        return view('admin.posts.create', compact('categories'));
+        return view('admin.admin-posts.create', compact('categories'));
     }
 
     /**
@@ -54,7 +54,7 @@ class PostController extends Controller
 
         \App\Models\Post::create($data);
 
-        return redirect()->route('admin.posts.index')
+        return redirect()->route('admin.admin-posts.index')
             ->with('success', 'Post berhasil ditambahkan.');
     }
 
@@ -72,7 +72,7 @@ class PostController extends Controller
     public function edit(\App\Models\Post $post)
     {
         $categories = \App\Models\Category::all();
-        return view('admin.posts.edit', compact('post', 'categories'));
+        return view('admin.admin-posts.edit', compact('post', 'categories'));
     }
 
     /**
@@ -103,7 +103,7 @@ class PostController extends Controller
 
         $post->update($data);
 
-        return redirect()->route('admin.posts.index')
+        return redirect()->route('admin.admin-posts.index')
             ->with('success', 'Post berhasil diperbarui.');
     }
 
@@ -114,7 +114,7 @@ class PostController extends Controller
     {
         $post->delete();
 
-        return redirect()->route('admin.posts.index')
+        return redirect()->route('admin.admin-posts.index')
             ->with('success', 'Post berhasil dihapus.');
     }
 }
