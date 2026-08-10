@@ -25,7 +25,7 @@ class HomeController extends Controller
     {
         try {
             $siteSettings = SiteSetting::first();
-            $sliders = Slider::active()->ordered()->get();
+            $sliders = Slider::active()->ordered()->limit(Slider::MAX_ITEMS)->get();
             $runningTexts = RunningText::active()->ordered()->get();
             $menus = Menu::active()->ordered()->get();
             

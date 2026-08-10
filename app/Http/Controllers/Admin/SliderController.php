@@ -14,7 +14,9 @@ class SliderController extends Controller
     public function index()
     {
         $sliders = Slider::orderBy('order')->get();
-        return view('admin.sliders.index', compact('sliders'));
+        $maxSliders = Slider::MAX_ITEMS;
+
+        return view('admin.sliders.index', compact('sliders', 'maxSliders'));
     }
 
     /**
@@ -22,6 +24,11 @@ class SliderController extends Controller
      */
     public function create()
     {
+        if (Slider::count() >= Slider::MAX_ITEMS) {
+            return redirect()->route('admin.sliders.index')
+                ->with('error', 'Slider maksimal ' . Slider::MAX_ITEMS . ' item. Hapus atau edit slider yang ada terlebih dahulu.');
+        }
+
         return view('admin.sliders.create');
     }
 
@@ -30,6 +37,11 @@ class SliderController extends Controller
      */
     public function store(Request $request)
     {
+        if (Slider::count() >= Slider::MAX_ITEMS) {
+            return redirect()->route('admin.sliders.index')
+                ->with('error', 'Slider maksimal ' . Slider::MAX_ITEMS . ' item. Hapus atau edit slider yang ada terlebih dahulu.');
+        }
+
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',

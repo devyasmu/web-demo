@@ -9,6 +9,8 @@ class Slider extends Model
 {
     use HasFactory;
 
+    public const MAX_ITEMS = 4;
+
     protected $fillable = [
         'title',
         'description',

@@ -8,12 +8,27 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="card-title mb-0">Daftar Slider</h5>
-                <a href="{{ route('admin.sliders.create') }}" class="btn btn-primary">
-                    <i class="bi bi-plus"></i> Tambah Slider
-                </a>
+                <div>
+                    <h5 class="card-title mb-0">Daftar Slider</h5>
+                    <small class="text-muted">Maksimal {{ $maxSliders }} slider. Saat ini {{ $sliders->count() }} slider.</small>
+                </div>
+                @if($sliders->count() < $maxSliders)
+                    <a href="{{ route('admin.sliders.create') }}" class="btn btn-primary">
+                        <i class="bi bi-plus"></i> Tambah Slider
+                    </a>
+                @else
+                    <button type="button" class="btn btn-secondary" disabled>
+                        <i class="bi bi-plus"></i> Batas Terpenuhi
+                    </button>
+                @endif
             </div>
             <div class="card-body">
+                @if(session('error'))
+                    <div class="alert alert-warning">
+                        {{ session('error') }}
+                    </div>
+                @endif
+
                 @if($sliders->count() > 0)
                     <div class="table-responsive">
                         <table class="table table-striped">
