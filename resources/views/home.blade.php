@@ -17,20 +17,42 @@
     $siteName = $siteSettings->site_name ?? 'YASMU Manyar';
     $siteDescription = $siteSettings->site_description ?? 'Yayasan pendidikan Islam di Manyar Gresik yang membina generasi beradab, berilmu, dan siap tumbuh.';
     $siteTagline = $siteSettings->site_tagline ?? null;
-    $heroSlider = collect($sliders ?? [])->first();
-    $heroHeadline = $siteTagline ?: 'Generasi beradab, siap tumbuh.';
-    $heroDescription = $heroSlider->description ?? $siteDescription;
-    $primaryActionText = $heroSlider->button_text ?? 'Jelajahi Program';
-    $primaryActionLink = $heroSlider->button_link ?? route('programs.index');
-    $heroImage = $heroSlider && $heroSlider->image ? asset('storage/' . $heroSlider->image) : null;
+    $sliderList = collect($sliders ?? [])->take(4)->values();
+    $defaultHeroHeadline = $siteTagline ?: 'Generasi beradab, siap tumbuh.';
+    $defaultHeroImage = null;
 
-    if (!$heroImage && optional($postList->first())->featured_image) {
-        $heroImage = asset('storage/' . $postList->first()->featured_image);
+    if (optional($postList->first())->featured_image) {
+        $defaultHeroImage = asset('storage/' . $postList->first()->featured_image);
     }
 
-    if (!$heroImage && optional($programList->first())->featured_image) {
-        $heroImage = asset('storage/' . $programList->first()->featured_image);
+    if (!$defaultHeroImage && optional($programList->first())->featured_image) {
+        $defaultHeroImage = asset('storage/' . $programList->first()->featured_image);
     }
+
+    $heroSlides = $sliderList->map(fn ($slider) => [
+        'headline' => $slider->title ?: $defaultHeroHeadline,
+        'description' => $slider->description ?: $siteDescription,
+        'buttonText' => $slider->button_text ?: 'Jelajahi Program',
+        'buttonLink' => $slider->button_link ?: route('programs.index'),
+        'image' => $slider->image ? asset('storage/' . $slider->image) : $defaultHeroImage,
+    ]);
+
+    if ($heroSlides->isEmpty()) {
+        $heroSlides = collect([[
+            'headline' => $defaultHeroHeadline,
+            'description' => $siteDescription,
+            'buttonText' => 'Jelajahi Program',
+            'buttonLink' => route('programs.index'),
+            'image' => $defaultHeroImage,
+        ]]);
+    }
+
+    $activeHeroSlide = $heroSlides->first();
+    $heroHeadline = $activeHeroSlide['headline'];
+    $heroDescription = $activeHeroSlide['description'];
+    $primaryActionText = $activeHeroSlide['buttonText'];
+    $primaryActionLink = $activeHeroSlide['buttonLink'];
+    $heroImage = $activeHeroSlide['image'];
 
     $quickLinksResolved = $quickLinkList->count() > 0
         ? $quickLinkList->take(5)->map(fn ($link) => [
@@ -74,21 +96,19 @@
 </div>
 @endif
 
-<section class="home-hero">
+<section class="home-hero" data-home-hero>
     <div class="home-hero-media">
-        @if($heroImage)
-            <img src="{{ $heroImage }}" alt="{{ $heroHeadline }}">
-        @endif
+        <img data-hero-image src="{{ $heroImage }}" alt="{{ $heroHeadline }}" @unless($heroImage) hidden @endunless>
     </div>
     <div class="home-wrap">
         <div class="home-hero-grid">
             <div class="home-hero-copy">
                 <div class="home-kicker"><i class="bi bi-stars"></i> Pendidikan Islam Manyar Gresik</div>
-                <h1>{{ $heroHeadline }}</h1>
-                <p>{{ $heroDescription }}</p>
+                <h1 data-hero-headline>{{ $heroHeadline }}</h1>
+                <p data-hero-description>{{ $heroDescription }}</p>
                 <div class="home-actions">
-                    <a class="home-btn home-btn-gold" href="{{ $primaryActionLink }}">
-                        <span>{{ $primaryActionText }}</span>
+                    <a class="home-btn home-btn-gold" href="{{ $primaryActionLink }}" data-hero-primary>
+                        <span data-hero-button-text>{{ $primaryActionText }}</span>
                         <i class="bi bi-arrow-up-right"></i>
                     </a>
                     <a class="home-btn home-btn-glass" href="{{ route('galleries.index') }}">
@@ -394,6 +414,7 @@ body {
     object-fit: cover;
     display: block;
     filter: saturate(1.08) contrast(1.02);
+    transition: opacity 0.48s ease, transform 0.48s ease;
 }
 
 .home-hero-media::after {
@@ -442,6 +463,20 @@ body {
     font-size: 1.06rem;
     line-height: 1.75;
     margin: 0 0 26px;
+}
+
+.home-hero-copy h1,
+.home-hero-copy p,
+.home-actions {
+    transition: opacity 0.42s ease, transform 0.42s ease;
+}
+
+.home-hero.is-changing .home-hero-media img,
+.home-hero.is-changing .home-hero-copy h1,
+.home-hero.is-changing .home-hero-copy p,
+.home-hero.is-changing .home-actions {
+    opacity: 0.18;
+    transform: translateY(8px);
 }
 
 .home-actions,
@@ -1157,4 +1192,92 @@ body {
     }
 }
 </style>
+@endpush
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const heroSlides = {{ \Illuminate\Support\Js::from($heroSlides->values()) }};
+    const hero = document.querySelector('[data-home-hero]');
+
+    if (!hero || heroSlides.length < 2 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        return;
+    }
+
+    const headline = hero.querySelector('[data-hero-headline]');
+    const description = hero.querySelector('[data-hero-description]');
+    const image = hero.querySelector('[data-hero-image]');
+    const primary = hero.querySelector('[data-hero-primary]');
+    const buttonText = hero.querySelector('[data-hero-button-text]');
+    const intervalMs = 6000;
+    let activeIndex = 0;
+    let timer = null;
+
+    heroSlides.forEach((slide) => {
+        if (!slide.image) {
+            return;
+        }
+
+        const preload = new Image();
+        preload.src = slide.image;
+    });
+
+    const renderSlide = (slide) => {
+        hero.classList.add('is-changing');
+
+        window.setTimeout(() => {
+            headline.textContent = slide.headline;
+            description.textContent = slide.description;
+            primary.href = slide.buttonLink;
+            buttonText.textContent = slide.buttonText;
+
+            if (slide.image) {
+                image.hidden = false;
+                image.src = slide.image;
+                image.alt = slide.headline;
+            } else {
+                image.hidden = true;
+                image.removeAttribute('src');
+                image.alt = '';
+            }
+
+            window.setTimeout(() => hero.classList.remove('is-changing'), 80);
+        }, 260);
+    };
+
+    const nextSlide = () => {
+        activeIndex = (activeIndex + 1) % heroSlides.length;
+        renderSlide(heroSlides[activeIndex]);
+    };
+
+    const startRotation = () => {
+        if (timer || document.hidden) {
+            return;
+        }
+
+        timer = window.setInterval(nextSlide, intervalMs);
+    };
+
+    const stopRotation = () => {
+        if (!timer) {
+            return;
+        }
+
+        window.clearInterval(timer);
+        timer = null;
+    };
+
+    hero.addEventListener('mouseenter', stopRotation);
+    hero.addEventListener('mouseleave', startRotation);
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            stopRotation();
+        } else {
+            startRotation();
+        }
+    });
+
+    startRotation();
+});
+</script>
 @endpush
