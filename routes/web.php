@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\DownloadController as AdminDownloadController;
 use App\Http\Controllers\Admin\TestimonialController as AdminTestimonialController;
 use App\Http\Controllers\Admin\FaqController as AdminFaqController;
 use App\Http\Controllers\Admin\ContactController as AdminContactController;
+use App\Http\Controllers\Admin\InstitutionContactController as AdminInstitutionContactController;
 use App\Http\Controllers\Public\PostController;
 use App\Http\Controllers\Public\GalleryController;
 use App\Http\Controllers\Public\ContactController;
@@ -163,6 +164,16 @@ Route::prefix('admin')->middleware(['admin.hidden', 'auth'])->group(function () 
         'edit' => 'admin.quick-links.edit',
         'update' => 'admin.quick-links.update',
         'destroy' => 'admin.quick-links.destroy'
+    ]);
+
+    // Institution Contacts (CP Lembaga)
+    Route::resource('institution-contacts', AdminInstitutionContactController::class)->except(['show'])->names([
+        'index' => 'admin.institution-contacts.index',
+        'create' => 'admin.institution-contacts.create',
+        'store' => 'admin.institution-contacts.store',
+        'edit' => 'admin.institution-contacts.edit',
+        'update' => 'admin.institution-contacts.update',
+        'destroy' => 'admin.institution-contacts.destroy'
     ]);
     
     // Pages

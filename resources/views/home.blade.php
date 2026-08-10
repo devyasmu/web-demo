@@ -3,1671 +3,1158 @@
 @section('title', $siteSettings->site_name ?? 'Yayasan Pendidikan Islam')
 @section('description', $siteSettings->site_description ?? 'Yayasan Pendidikan Islam yang berkomitmen untuk memberikan pendidikan berkualitas dengan nilai-nilai Islam yang kuat.')
 
+@section('content')
+@php
+    $programList = $featuredPrograms instanceof \Illuminate\Contracts\Pagination\Paginator ? $featuredPrograms->getCollection() : collect($featuredPrograms ?? []);
+    $postList = $featuredPosts instanceof \Illuminate\Contracts\Pagination\Paginator ? $featuredPosts->getCollection() : collect($featuredPosts ?? []);
+    $announcementList = $announcements instanceof \Illuminate\Contracts\Pagination\Paginator ? $announcements->getCollection() : collect($announcements ?? []);
+    $testimonialList = $testimonials instanceof \Illuminate\Contracts\Pagination\Paginator ? $testimonials->getCollection() : collect($testimonials ?? []);
+    $featureList = collect($features ?? []);
+    $statisticList = collect($statistics ?? []);
+    $quickLinkList = collect($quickLinks ?? []);
+    $institutionContactList = collect($institutionContacts ?? []);
+
+    $siteName = $siteSettings->site_name ?? 'YASMU Manyar';
+    $siteDescription = $siteSettings->site_description ?? 'Yayasan pendidikan Islam di Manyar Gresik yang membina generasi beradab, berilmu, dan siap tumbuh.';
+    $siteTagline = $siteSettings->site_tagline ?? null;
+    $heroSlider = collect($sliders ?? [])->first();
+    $heroHeadline = $siteTagline ?: 'Generasi beradab, siap tumbuh.';
+    $heroDescription = $heroSlider->description ?? $siteDescription;
+    $primaryActionText = $heroSlider->button_text ?? 'Jelajahi Program';
+    $primaryActionLink = $heroSlider->button_link ?? route('programs.index');
+    $heroImage = $heroSlider && $heroSlider->image ? asset('storage/' . $heroSlider->image) : null;
+
+    if (!$heroImage && optional($postList->first())->featured_image) {
+        $heroImage = asset('storage/' . $postList->first()->featured_image);
+    }
+
+    if (!$heroImage && optional($programList->first())->featured_image) {
+        $heroImage = asset('storage/' . $programList->first()->featured_image);
+    }
+
+    $quickLinksResolved = $quickLinkList->count() > 0
+        ? $quickLinkList->take(5)->map(fn ($link) => [
+            'title' => $link->title,
+            'url' => $link->url,
+            'icon' => $link->icon ?: 'bi bi-link-45deg',
+            'external' => true,
+        ])
+        : collect([
+            ['title' => 'Program', 'url' => route('programs.index'), 'icon' => 'bi bi-journal-richtext', 'external' => false],
+            ['title' => 'Pengumuman', 'url' => route('announcements.index'), 'icon' => 'bi bi-megaphone', 'external' => false],
+            ['title' => 'Galeri', 'url' => route('galleries.index'), 'icon' => 'bi bi-images', 'external' => false],
+            ['title' => 'Download', 'url' => route('downloads.index'), 'icon' => 'bi bi-download', 'external' => false],
+            ['title' => 'Kontak', 'url' => route('contacts.index'), 'icon' => 'bi bi-chat-dots', 'external' => false],
+        ]);
+
+    $institutionContactsResolved = $institutionContactList->count() > 0
+        ? $institutionContactList
+        : collect([
+            (object) ['name' => 'Yayasan', 'contact_person' => null, 'phone' => $siteSettings->phone ?? null, 'description' => 'Informasi umum dan kemitraan', 'icon' => 'bi bi-whatsapp'],
+            (object) ['name' => 'MTs', 'contact_person' => null, 'phone' => $siteSettings->phone ?? null, 'description' => 'Informasi jenjang madrasah tsanawiyah', 'icon' => 'bi bi-whatsapp'],
+            (object) ['name' => 'SMP', 'contact_person' => null, 'phone' => $siteSettings->phone ?? null, 'description' => 'Informasi jenjang sekolah menengah pertama', 'icon' => 'bi bi-whatsapp'],
+            (object) ['name' => 'MA', 'contact_person' => null, 'phone' => $siteSettings->phone ?? null, 'description' => 'Informasi jenjang madrasah aliyah', 'icon' => 'bi bi-whatsapp'],
+            (object) ['name' => 'SMA', 'contact_person' => null, 'phone' => $siteSettings->phone ?? null, 'description' => 'Informasi jenjang sekolah menengah atas', 'icon' => 'bi bi-whatsapp'],
+            (object) ['name' => 'SMK', 'contact_person' => null, 'phone' => $siteSettings->phone ?? null, 'description' => 'Informasi jenjang sekolah menengah kejuruan', 'icon' => 'bi bi-whatsapp'],
+        ]);
+
+    $whatsappUrl = \App\Helpers\ContactHelper::whatsappUrl($siteSettings->phone ?? null, 'Halo, saya ingin bertanya tentang program pendidikan YASMU Manyar.');
+    $programCount = $programList->count();
+    $postCount = $postList->count();
+    $testimonialCount = $testimonialList->count();
+    $serviceCount = $quickLinksResolved->count();
+@endphp
+
 @if(isset($error))
-<div class="alert alert-danger" role="alert">
-    <i class="bi bi-exclamation-triangle me-2"></i>
-    {{ $error }}
+<div class="home-wrap py-3">
+    <div class="alert alert-danger" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        {{ $error }}
+    </div>
 </div>
 @endif
 
-@section('content')
-<!-- Modern Hero Section -->
-@if($sliders && $sliders->count() > 0)
-<section class="modern-hero" style="padding-bottom: 68px;">
-    <div class="hero-background">
-        <div class="hero-overlay"></div>
+<section class="home-hero">
+    <div class="home-hero-media">
+        @if($heroImage)
+            <img src="{{ $heroImage }}" alt="{{ $heroHeadline }}">
+        @endif
     </div>
-    <div class="container position-relative" style="padding: 0 20px;">
-        <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
-            <div class="carousel-indicators modern-indicators">
-                @foreach($sliders as $index => $slider)
-                    <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="{{ $index }}" 
-                            class="{{ $index === 0 ? 'active' : '' }}" aria-current="true" aria-label="Slide {{ $index + 1 }}"></button>
-                @endforeach
-            </div>
-            
-            <div class="carousel-inner">
-                @foreach($sliders as $index => $slider)
-                <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                    <div class="row align-items-center min-vh-100">
-                        <div class="col-lg-5">
-                            <div class="hero-content modern-content">
-                                <h1 class="hero-title">{{ $slider->title }}</h1>
-                                @if($slider->description)
-                                    <p class="hero-description">{{ $slider->description }}</p>
-                                @endif
-                                @if($slider->button_text && $slider->button_link)
-                                    <div class="hero-buttons">
-                                        <a href="{{ $slider->button_link }}" class="btn btn-modern-primary">
-                                            <i class="bi bi-arrow-right me-2"></i>{{ $slider->button_text }}
-                                        </a>
-                                        <a href="#programs" class="btn btn-modern-primary">
-                                            <i class="bi bi-play-circle me-2"></i>Lihat Program
-                                        </a>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-                        <div class="col-lg-7">
-                            <div class="hero-image-container">
-                                @if($slider->image)
-                                    <img src="{{ asset('storage/' . $slider->image) }}" alt="{{ $slider->title }}" class="hero-image">
-                                @else
-                                    <div class="hero-placeholder">
-                                        <i class="bi bi-mortarboard"></i>
-                                    </div>
-                                @endif
-                                <div class="hero-shapes">
-                                    <div class="shape-1"></div>
-                                    <div class="shape-2"></div>
-                                    <div class="shape-3"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    <div class="home-wrap">
+        <div class="home-hero-grid">
+            <div class="home-hero-copy">
+                <div class="home-kicker"><i class="bi bi-stars"></i> Pendidikan Islam Manyar Gresik</div>
+                <h1>{{ $heroHeadline }}</h1>
+                <p>{{ $heroDescription }}</p>
+                <div class="home-actions">
+                    <a class="home-btn home-btn-gold" href="{{ $primaryActionLink }}">
+                        <span>{{ $primaryActionText }}</span>
+                        <i class="bi bi-arrow-up-right"></i>
+                    </a>
+                    <a class="home-btn home-btn-glass" href="{{ route('galleries.index') }}">
+                        <i class="bi bi-play-circle"></i>
+                        <span>Lihat Kegiatan</span>
+                    </a>
                 </div>
-                @endforeach
             </div>
-            
-            <button class="carousel-control-prev modern-control" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next modern-control" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Next</span>
-            </button>
+            <aside class="home-live-card">
+                <div class="home-live-head">
+                    <div>
+                        <span>YASMU Pulse</span>
+                        <strong>Aktif hari ini</strong>
+                    </div>
+                    <span class="home-live-dot"></span>
+                </div>
+                <div class="home-live-grid">
+                    <div><b>{{ $programCount }}</b><span>Program</span></div>
+                    <div><b>{{ $postCount }}</b><span>Berita</span></div>
+                    <div><b>{{ $testimonialCount }}</b><span>Testimoni</span></div>
+                    <div><b>{{ $serviceCount }}</b><span>Akses</span></div>
+                </div>
+            </aside>
         </div>
     </div>
 </section>
-@else
-<!-- Fallback Hero Section -->
-<section class="modern-hero fallback-hero">
-    <div class="hero-background">
-        <div class="hero-overlay"></div>
-    </div>
-    <div class="container position-relative">
-        <div class="row align-items-center min-vh-100">
-            <div class="col-lg-5">
-                <div class="hero-content modern-content">
-                    <h1 class="hero-title">Selamat Datang di {{ $siteSettings->site_name ?? 'Yayasan Pendidikan Islam' }}</h1>
-                    <p class="hero-description">{{ $siteSettings->site_description ?? 'Membangun generasi yang berakhlak mulia dan berprestasi dengan pendidikan Islam yang terintegrasi.' }}</p>
-                    <div class="hero-buttons">
-                        <a href="#programs" class="btn btn-modern-primary">
-                            <i class="bi bi-arrow-right me-2"></i>Lihat Program
-                        </a>
-                        <a href="{{ route('contacts.index') }}" class="btn btn-modern-primary">
-                            <i class="bi bi-telephone me-2"></i>Hubungi Kami
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-7">
-                <div class="hero-image-container">
-                    <div class="hero-placeholder">
-                        <i class="bi bi-mortarboard"></i>
-                    </div>
-                    <div class="hero-shapes">
-                        <div class="shape-1"></div>
-                        <div class="shape-2"></div>
-                        <div class="shape-3"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-@endif
 
-<!-- Quick Access Section (Akses Cepat) -->
-@if(isset($quickLinks) && $quickLinks->count() > 0)
-<section class="quick-access-section">
-    <div class="container">
-        <div class="quick-access-inner">
-            @foreach($quickLinks as $link)
-            <a href="{{ $link->url }}" target="_blank" rel="noopener noreferrer" class="quick-access-item">
-                <div class="quick-access-icon">
-                    <i class="{{ $link->icon }}"></i>
-                </div>
-                <span class="quick-access-title">{{ $link->title }}</span>
+<section class="home-quick">
+    <div class="home-wrap">
+        <div class="home-quick-grid">
+            @foreach($quickLinksResolved as $link)
+            <a href="{{ $link['url'] }}" @if($link['external']) target="_blank" rel="noopener noreferrer" @endif>
+                <i class="{{ $link['icon'] }}"></i>
+                <span>{{ $link['title'] }}</span>
             </a>
             @endforeach
         </div>
     </div>
 </section>
-@endif
 
-<!-- Modern Features Section -->
-<section class="modern-section features-section">
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <div class="section-header">
-                    <div class="section-badge">
-                        <i class="bi bi-star"></i>
-                        Keunggulan Kami
-                    </div>
-                    <h2 class="section-title">Mengapa Memilih Kami</h2>
-                    <p class="section-description">Komitmen kami dalam memberikan pendidikan terbaik</p>
-                </div>
-            </div>
+<section class="home-section home-story">
+    <div class="home-wrap home-story-grid">
+        <div>
+            <div class="home-section-label">Fokus Pendidikan</div>
+            <h2>Rapi secara sistem, hangat secara pengalaman.</h2>
         </div>
-        <div class="row">
-            @forelse($features ?? collect() as $feature)
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="feature-card-modern">
-                    <div class="feature-icon">
-                        <i class="{{ $feature->icon ?? 'bi bi-star' }}"></i>
-                    </div>
-                    <h3 class="feature-title">{{ $feature->title }}</h3>
-                    <p class="feature-description">{{ $feature->description }}</p>
-                </div>
+        <div>
+            <p>{{ $siteDescription }}</p>
+            <div class="home-proof-grid">
+                <div><i class="bi bi-check2-circle"></i> Pembiasaan ibadah dan karakter</div>
+                <div><i class="bi bi-chat-heart"></i> Relasi dekat dengan wali murid</div>
+                <div><i class="bi bi-award"></i> Akademik, adab, dan prestasi</div>
             </div>
-            @empty
-            <div class="col-12">
-                <div class="text-center">
-                    <p>Belum ada data fitur. Silakan tambahkan melalui admin panel.</p>
-                </div>
-            </div>
-            @endforelse
         </div>
     </div>
 </section>
 
-<!-- Modern Announcements Section -->
-@if($announcements && $announcements->count() > 0)
-<section class="modern-section announcements-section">
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <div class="section-header">
-                    <div class="section-badge">
-                        <i class="bi bi-megaphone"></i>
-                        <span>Pengumuman</span>
-                    </div>
-                    <h2 class="section-title">Informasi Terbaru</h2>
-                    <p class="section-subtitle">Dapatkan informasi terkini tentang kegiatan dan program yayasan</p>
-                </div>
+@if($featureList->count() > 0)
+<section class="home-section home-features">
+    <div class="home-wrap">
+        <div class="home-section-head">
+            <div>
+                <div class="home-section-label">Keunggulan</div>
+                <h2>Program sekolah terasa hidup dari aktivitas hariannya.</h2>
             </div>
         </div>
-        <div class="row g-4">
-            @foreach($announcements as $announcement)
-            <div class="col-md-6 col-lg-4">
-                <div class="modern-card announcement-card">
-                    <div class="card-header-modern">
-                        <div class="priority-badge priority-{{ $announcement->priority }}">
-                            <i class="bi bi-{{ $announcement->priority === 'urgent' ? 'exclamation-triangle' : ($announcement->priority === 'high' ? 'star' : 'info-circle') }}"></i>
-                            <span>{{ ucfirst($announcement->priority) }}</span>
-                        </div>
-                        <div class="date-badge">
-                            {{ $announcement->created_at->format('d M') }}
-                        </div>
-                    </div>
-                    <div class="card-body-modern">
-                        <h5 class="card-title-modern">{{ $announcement->title }}</h5>
-                        <p class="card-text-modern">{{ Str::limit(strip_tags($announcement->content), 120) }}</p>
-                        <div class="card-footer-modern">
-                            <a href="{{ \App\Helpers\RouteHelper::safeRouteWithMessage('announcements.show', $announcement->slug ?? '', 'Detail pengumuman tidak tersedia') }}" class="btn-read-more">
-                                <span>Baca Selengkapnya</span>
-                                <i class="bi bi-arrow-right"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="home-feature-grid">
+            @foreach($featureList->take(4) as $feature)
+            <article>
+                <i class="{{ $feature->icon ?: 'bi bi-award' }}"></i>
+                <h3>{{ $feature->title }}</h3>
+                <p>{{ $feature->description }}</p>
+            </article>
             @endforeach
         </div>
-        
-        <!-- Pagination for Announcements -->
-        @if($announcements && $announcements->hasPages())
-        <div class="row mt-4">
-            <div class="col-12">
-                <nav aria-label="Announcements pagination">
-                    {{ $announcements->links('pagination::bootstrap-4') }}
-                </nav>
-            </div>
-        </div>
-        @endif
     </div>
 </section>
 @endif
 
-<!-- Modern Programs Section -->
-@if($featuredPrograms && $featuredPrograms->count() > 0)
-<section id="programs" class="modern-section programs-section">
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <div class="section-header">
-                    <div class="section-badge">
-                        <i class="bi bi-mortarboard"></i>
-                        <span>Program</span>
-                    </div>
-                    <h2 class="section-title">Program Unggulan</h2>
-                    <p class="section-subtitle">Program pendidikan berkualitas dengan pendekatan Islam yang terintegrasi</p>
-                </div>
+@if($programList->count() > 0)
+<section id="programs" class="home-section home-programs">
+    <div class="home-wrap">
+        <div class="home-section-head">
+            <div>
+                <div class="home-section-label">Program Unggulan</div>
+                <h2>Ruang belajar yang terlihat, bukan sekadar daftar.</h2>
             </div>
+            <a class="home-btn home-btn-gold" href="{{ route('programs.index') }}">Semua Program</a>
         </div>
-        <div class="row g-4">
-            @foreach($featuredPrograms as $program)
-            <div class="col-md-6 col-lg-4">
-                <div class="modern-card program-card">
-                    <div class="card-image-container">
-                        @if($program->featured_image)
-                            <img src="{{ asset('storage/' . $program->featured_image) }}" alt="{{ $program->title }}" class="card-image">
-                        @else
-                            <div class="card-image-placeholder">
-                                <i class="bi bi-mortarboard"></i>
-                            </div>
-                        @endif
-                        <div class="card-overlay">
-                            <div class="overlay-content">
-                                <a href="{{ \App\Helpers\RouteHelper::safeRouteWithMessage('programs.show', $program->slug ?? '', 'Detail program tidak tersedia') }}" class="btn-overlay">
-                                    <i class="bi bi-eye"></i>
-                                    <span>Lihat Detail</span>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body-modern">
-                        <div class="program-category">
-                            <i class="bi bi-book"></i>
-                            <span>Program Pendidikan</span>
-                        </div>
-                        <h5 class="card-title-modern">{{ $program->title }}</h5>
-                        @if($program->excerpt)
-                            <p class="card-text-modern">{{ $program->excerpt }}</p>
-                        @endif
-                        <div class="card-footer-modern">
-                            <a href="{{ \App\Helpers\RouteHelper::safeRouteWithMessage('programs.show', $program->slug ?? '', 'Detail program tidak tersedia') }}" class="btn-modern-card">
-                                <span>Lihat Detail</span>
-                                <i class="bi bi-arrow-right"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @endforeach
-        </div>
-        <div class="row mt-3">
-            <div class="col-12 text-center">
-                <a href="{{ route('programs.index') }}" class="btn btn-modern-outline-large">
-                    <i class="bi bi-grid me-2"></i>
-                    Lihat Semua Program
-                </a>
-            </div>
-        </div>
-        
-        <!-- Pagination for Programs -->
-        @if($featuredPrograms && $featuredPrograms->hasPages())
-        <div class="row mt-4">
-            <div class="col-12">
-                <nav aria-label="Programs pagination">
-                    {{ $featuredPrograms->links('pagination::bootstrap-4') }}
-                </nav>
-            </div>
-        </div>
-        @endif
-    </div>
-</section>
-@endif
-
-<!-- Modern Posts Section -->
-@if($featuredPosts && $featuredPosts->count() > 0)
-<section class="modern-section posts-section">
-<div class="container">
-        <div class="row">
-            <div class="col-12">
-                <div class="section-header">
-                    <div class="section-badge">
-                        <i class="bi bi-newspaper"></i>
-                        <span>Artikel</span>
-                    </div>
-                    <h2 class="section-title">Artikel Terbaru</h2>
-                    <p class="section-subtitle">Kumpulan artikel dan berita terkini seputar pendidikan dan kegiatan yayasan</p>
-                </div>
-            </div>
-        </div>
-        <div class="row g-4">
-            @foreach($featuredPosts as $post)
-            <div class="col-md-6 col-lg-4">
-                <div class="modern-card post-card">
-                    <div class="card-image-container">
-                        @if($post->featured_image)
-                            <img src="{{ asset('storage/' . $post->featured_image) }}" alt="{{ $post->title }}" class="card-image">
-                        @else
-                            <div class="card-image-placeholder">
-                                <i class="bi bi-newspaper"></i>
-                            </div>
-                        @endif
-                        <div class="card-overlay">
-                            <div class="overlay-content">
-                                <a href="{{ \App\Helpers\RouteHelper::safeRouteWithMessage('posts.show', $post->slug ?? '', 'Detail artikel tidak tersedia') }}" class="btn-overlay">
-                                    <i class="bi bi-eye"></i>
-                                    <span>Baca Artikel</span>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body-modern">
-                        <div class="post-meta">
-                            <span class="category-badge" style="background-color: {{ $post->category->color }} }};">
-                                {{ $post->category->name }}
-                            </span>
-                            <span class="post-date">{{ $post->created_at->format('d M Y') }}</span>
-                        </div>
-                        <h5 class="card-title-modern">{{ $post->title }}</h5>
-                        @if($post->excerpt)
-                            <p class="card-text-modern">{{ $post->excerpt }}</p>
-                        @endif
-                        <div class="card-footer-modern">
-                            <a href="{{ \App\Helpers\RouteHelper::safeRouteWithMessage('posts.show', $post->slug ?? '', 'Detail artikel tidak tersedia') }}" class="btn-read-more">
-                                <span>Baca Selengkapnya</span>
-                                <i class="bi bi-arrow-right"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @endforeach
-        </div>
-        <div class="row mt-3">
-            <div class="col-12 text-center">
-                <a href="{{ route('posts.index') }}" class="btn btn-modern-outline-large">
-                    <i class="bi bi-newspaper me-2"></i>
-                    Lihat Semua Artikel
-                </a>
-            </div>
-        </div>
-        
-        <!-- Pagination for Posts -->
-        @if($featuredPosts && $featuredPosts->hasPages())
-        <div class="row mt-4">
-            <div class="col-12">
-                <nav aria-label="Posts pagination">
-                    {{ $featuredPosts->links('pagination::bootstrap-4') }}
-                </nav>
-            </div>
-        </div>
-        @endif
-    </div>
-</section>
-@endif
-
-<!-- Modern Stats Section -->
-<section class="modern-section stats-section">
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <div class="section-header">
-                    <div class="section-badge">
-                        <i class="bi bi-graph-up"></i>
-                        Statistik Yayasan
-                    </div>
-                    <h2 class="section-title">Pencapaian Kami</h2>
-                    <p class="section-description">Membangun kepercayaan melalui prestasi dan dedikasi</p>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            @forelse($statistics ?? collect() as $statistic)
-            <div class="col-lg-3 col-md-6 mb-4">
-                <div class="stat-card-modern">
-                    <div class="stat-icon">
-                        <i class="{{ $statistic->icon ?? 'bi bi-graph-up' }}"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="stat-number">{{ $statistic->value }}</div>
-                        <div class="stat-label">{{ $statistic->title }}</div>
-                    </div>
-                </div>
-            </div>
-            @empty
-            <div class="col-12">
-                <div class="text-center text-white">
-                    <p>Belum ada data statistik. Silakan tambahkan melalui admin panel.</p>
-                </div>
-            </div>
-            @endforelse
-        </div>
-    </div>
-</section>
-
-<!-- Modern Testimonials Section -->
-@if($testimonials && $testimonials->count() > 0)
-<section class="modern-section testimonials-section">
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <div class="section-header">
-                    <div class="section-badge">
-                        <i class="bi bi-quote"></i>
-                        <span>Testimoni</span>
-                    </div>
-                    <h2 class="section-title">Kata Mereka</h2>
-                    <p class="section-subtitle">Pengalaman dan kesan dari orang tua dan siswa yang telah bergabung</p>
-                </div>
-            </div>
-        </div>
-        <div class="row g-4">
-            @foreach($testimonials as $testimonial)
-            <div class="col-md-6 col-lg-4">
-                <div class="modern-card testimonial-card">
-                    <div class="card-body-modern text-center">
-                        <div class="testimonial-avatar">
-                            @if($testimonial->photo)
-                                <img src="{{ asset('storage/' . $testimonial->photo) }}" alt="{{ $testimonial->name }}" class="avatar-image">
-                            @else
-                                <div class="avatar-placeholder">
-                                    <i class="bi bi-person"></i>
-                                </div>
-                            @endif
-                        </div>
-                        <div class="testimonial-rating">
-                            @for($i = 1; $i <= 5; $i++)
-                                <i class="bi bi-star{{ $i <= $testimonial->rating ? '-fill' : '' }}"></i>
-                            @endfor
-                        </div>
-                        <blockquote class="testimonial-quote">
-                            "{{ $testimonial->testimonial }}"
-                        </blockquote>
-                        <div class="testimonial-author">
-                            <h6 class="author-name">{{ $testimonial->name }}</h6>
-                            @if($testimonial->position || $testimonial->company)
-                                <p class="author-title">{{ $testimonial->position }}{{ $testimonial->position && $testimonial->company ? ' - ' : '' }}{{ $testimonial->company }}</p>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @endforeach
-        </div>
-        
-        <!-- Pagination for Testimonials -->
-        @if($testimonials && $testimonials->hasPages())
-        <div class="row mt-4">
-            <div class="col-12">
-                <nav aria-label="Testimonials pagination">
-                    {{ $testimonials->links('pagination::bootstrap-4') }}
-                </nav>
-            </div>
-        </div>
-        @endif
-    </div>
-</section>
+        <div class="home-program-grid">
+            @foreach($programList->take(3) as $program)
+            <article class="home-program-card">
+                <a href="{{ \App\Helpers\RouteHelper::safeRouteWithMessage('programs.show', $program->slug ?? '', 'Detail program tidak tersedia') }}">
+                    @if($program->featured_image)
+                        <img src="{{ asset('storage/' . $program->featured_image) }}" alt="{{ $program->title }}">
+                    @else
+                        <span><i class="bi bi-journal-richtext"></i></span>
                     @endif
-
-<!-- Modern CTA Section -->
-<section class="modern-cta">
-    <div class="cta-background">
-        <div class="cta-overlay"></div>
-    </div>
-    <div class="container position-relative">
-        <div class="row align-items-center">
-            <div class="col-lg-8">
-                <div class="cta-content">
-                    <h2 class="cta-title">Bergabunglah dengan Kami</h2>
-                    <p class="cta-description">Daftarkan putra-putri Anda untuk mendapatkan pendidikan terbaik dengan nilai-nilai Islam yang kuat dan terintegrasi.</p>
-                    <div class="cta-features">
-                        <div class="feature-item">
-                            <i class="bi bi-check-circle"></i>
-                            <span>Pendidikan Berkualitas</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="bi bi-check-circle"></i>
-                            <span>Nilai Islam Terintegrasi</span>
-                        </div>
-                        <div class="feature-item">
-                            <i class="bi bi-check-circle"></i>
-                            <span>Guru Berpengalaman</span>
-                        </div>
+                    <div>
+                        <small>Program Pendidikan</small>
+                        <h3>{{ $program->title }}</h3>
                     </div>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="cta-actions">
-                    <div class="dropdown">
-                        <button class="btn btn-modern-primary-large dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-whatsapp me-2"></i>
-                            Hubungi Kami
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-cta">
-                            @php
-                                $whatsappUrl = \App\Helpers\ContactHelper::whatsappUrl($siteSettings->phone ?? null, 'Halo, saya ingin bertanya tentang program pendidikan.');
-                            @endphp
-                            @if($whatsappUrl)
-                                <li>
-                                    <a class="dropdown-item" href="{{ $whatsappUrl }}" target="_blank" rel="noopener noreferrer">
-                                        <i class="bi bi-whatsapp me-2"></i>Chat WhatsApp
-                                    </a>
-                                </li>
-                            @endif
-                            <li>
-                                <a class="dropdown-item" href="{{ route('contacts.index') }}">
-                                    <i class="bi bi-envelope me-2"></i>Isi Form Kontak
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+                </a>
+            </article>
+            @endforeach
         </div>
     </div>
 </section>
+@endif
+
+@if($postList->count() > 0)
+<section class="home-section home-activity">
+    <div class="home-wrap">
+        <div class="home-section-head">
+            <div>
+                <div class="home-section-label">Kabar YASMU</div>
+                <h2>Aktivitas terbaru tampil sebagai cerita.</h2>
+            </div>
+            <a class="home-btn home-btn-glass" href="{{ route('posts.index') }}">Semua Berita</a>
+        </div>
+        <div class="home-news-grid">
+            @foreach($postList->take(4) as $post)
+            <article>
+                <a href="{{ \App\Helpers\RouteHelper::safeRouteWithMessage('posts.show', $post->slug ?? '', 'Detail artikel tidak tersedia') }}">
+                    @if($post->featured_image)
+                        <img src="{{ asset('storage/' . $post->featured_image) }}" alt="{{ $post->title }}">
+                    @else
+                        <span><i class="bi bi-newspaper"></i></span>
+                    @endif
+                    <div>
+                        <time>{{ $post->created_at->format('d M Y') }}</time>
+                        <h3>{{ $post->title }}</h3>
+                    </div>
+                </a>
+            </article>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
+<section class="home-metric-band">
+    <div class="home-wrap home-metrics">
+        <div class="home-metrics-title">
+            <div class="home-section-label">Data Yayasan</div>
+            <h2>Angka dibuat terasa bernilai.</h2>
+        </div>
+        @forelse($statisticList->take(4) as $statistic)
+            <div class="home-metric"><b>{{ $statistic->value }}</b><span>{{ $statistic->title }}</span></div>
+        @empty
+            <div class="home-metric"><b>{{ $programCount }}</b><span>Program unggulan</span></div>
+            <div class="home-metric"><b>{{ $testimonialCount }}</b><span>Testimoni keluarga</span></div>
+            <div class="home-metric"><b>{{ $serviceCount }}</b><span>Akses cepat</span></div>
+            <div class="home-metric"><b>24</b><span>Layanan informasi</span></div>
+        @endforelse
+    </div>
+</section>
+
+@if($testimonialList->count() > 0)
+<section class="home-section home-voices">
+    <div class="home-wrap home-voices-grid">
+        <div>
+            <div class="home-section-label">Testimoni</div>
+            <h2>Kesan dari keluarga besar YASMU.</h2>
+        </div>
+        <div class="home-voice-list">
+            @foreach($testimonialList->take(2) as $testimonial)
+            <figure>
+                <blockquote>{{ $testimonial->testimonial }}</blockquote>
+                <figcaption>
+                    @if($testimonial->photo)
+                        <img src="{{ asset('storage/' . $testimonial->photo) }}" alt="{{ $testimonial->name }}">
+                    @else
+                        <span><i class="bi bi-person"></i></span>
+                    @endif
+                    <div>
+                        <strong>{{ $testimonial->name }}</strong>
+                        @if($testimonial->position || $testimonial->company)
+                            <small>{{ $testimonial->position }}{{ $testimonial->position && $testimonial->company ? ' - ' : '' }}{{ $testimonial->company }}</small>
+                        @endif
+                    </div>
+                </figcaption>
+            </figure>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
+<footer class="home-footer">
+    <div class="home-wrap">
+        <div class="home-footer-panel">
+            <div class="home-footer-main">
+                <div class="home-kicker"><i class="bi bi-stars"></i> Kontak Beranda</div>
+                <h2>Pilih CP lembaga yang tepat, lalu mulai percakapan.</h2>
+                <p>Footer beranda ini menjadi pusat aksi terakhir. Untuk sementara pilihan lembaga memakai nomor WhatsApp global dari Site Settings dengan pesan otomatis sesuai lembaga tujuan.</p>
+            </div>
+            <div class="home-footer-contact">
+                <h3>Hubungi via WhatsApp</h3>
+                <p>Modul CP per lembaga belum tersedia di admin. Struktur ini siap dihubungkan setelah modul dibuat.</p>
+                <div class="home-wa-options">
+                    @foreach($institutionContactsResolved as $contact)
+                        @php
+                            $contactMessage = 'Halo, saya ingin menghubungi ' . $contact->name . ' YASMU Manyar.';
+                            $contactUrl = \App\Helpers\ContactHelper::whatsappUrl($contact->phone ?? null, $contactMessage);
+                            $contactDescription = $contact->contact_person
+                                ? $contact->contact_person . ' - ' . ($contact->description ?: 'Informasi lembaga')
+                                : ($contact->description ?: 'Informasi lembaga');
+                        @endphp
+                        @if($contactUrl)
+                            <a class="home-wa-option" href="{{ $contactUrl }}" target="_blank" rel="noopener noreferrer">
+                                <i class="{{ $contact->icon ?: 'bi bi-whatsapp' }}"></i>
+                                <span><strong>{{ $contact->name }}</strong><span>{{ $contactDescription }}</span></span>
+                                <small>Chat</small>
+                            </a>
+                        @else
+                            <a class="home-wa-option" href="{{ route('contacts.index') }}">
+                                <i class="{{ $contact->icon ?: 'bi bi-chat-dots' }}"></i>
+                                <span><strong>{{ $contact->name }}</strong><span>{{ $contactDescription }}</span></span>
+                                <small>Kontak</small>
+                            </a>
+                        @endif
+                    @endforeach
+                </div>
+            </div>
+        </div>
+        <div class="home-footer-bottom">
+            <div class="home-footer-brand">
+                @if(isset($siteSettings) && $siteSettings->logo)
+                    <img src="{{ asset('storage/' . $siteSettings->logo) }}" alt="{{ $siteName }}">
+                @endif
+                <div>
+                    <h4>{{ $siteName }}</h4>
+                    <p>{{ $siteDescription }}</p>
+                </div>
+            </div>
+            <div>
+                <h4>Navigasi</h4>
+                <div class="home-footer-links">
+                    <a href="{{ route('programs.index') }}">Program</a>
+                    <a href="{{ route('posts.index') }}">Berita</a>
+                    <a href="{{ route('galleries.index') }}">Galeri</a>
+                    <a href="{{ route('downloads.index') }}">Download</a>
+                </div>
+            </div>
+            <div>
+                <h4>Kontak Yayasan</h4>
+                <p>
+                    {{ $siteSettings->address ?? 'Alamat yayasan belum diatur.' }}<br>
+                    {{ $siteSettings->email ?? 'Email belum diatur.' }}<br>
+                    {{ $siteSettings->phone ?? 'Telepon belum diatur.' }}
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>
 @endsection
 
 @push('styles')
 <style>
-/* Modern Hero Section */
-.modern-hero {
+:root {
+    --home-ink: #111827;
+    --home-muted: #667085;
+    --home-paper: #fbfaf6;
+    --home-panel: #ffffff;
+    --home-line: rgba(17, 24, 39, 0.11);
+    --home-green: #12664f;
+    --home-gold: #dda937;
+    --home-coral: #bd5444;
+    --home-deep: #17251f;
+    --home-shadow: 0 30px 90px rgba(22, 31, 48, 0.18);
+}
+
+body {
+    background: var(--home-paper) !important;
+}
+
+.footer {
+    display: none;
+}
+
+.home-wrap {
+    width: min(1440px, calc(100% - 48px));
+    margin: 0 auto;
+}
+
+.home-hero {
     position: relative;
-    min-height: 80vh;
-    max-height: 90vh;
-    display: flex;
-    align-items: center;
+    min-height: calc(100vh - 118px);
     overflow: hidden;
+    background: var(--home-deep);
+    color: #ffffff;
 }
 
-.hero-background {
+.home-hero-media {
     position: absolute;
-    top: 0;
-    left: 0;
+    inset: 0;
+}
+
+.home-hero-media img {
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 50%, var(--accent-color) 100%);
-    z-index: -2;
-}
-
-.hero-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.3);
-    z-index: -1;
-}
-
-.hero-content {
-    z-index: 2;
-    position: relative;
-}
-
-.hero-badge {
-    display: inline-block;
-}
-
-.badge-modern {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    padding: 0.5rem 1rem;
-    border-radius: 50px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.hero-title {
-    font-size: 3.5rem;
-    font-weight: 800;
-    color: white;
-    line-height: 1.2;
-    margin-bottom: 1.5rem;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.hero-description {
-    font-size: 1.25rem;
-    color: rgba(255, 255, 255, 0.9);
-    margin-bottom: 2rem;
-    line-height: 1.6;
-}
-
-.hero-buttons {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    margin-bottom: 2rem;
-}
-
-.btn-modern-primary {
-    background: var(--button-primary-color, #007bff);
-    color: var(--button-text-color, #ffffff);
-    border: none;
-    padding: 1rem 2rem;
-    border-radius: 50px;
-    font-weight: 600;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-.btn-modern-primary:hover {
-    background: var(--button-primary-hover, #0056b3);
-    color: var(--button-text-color, #ffffff);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-}
-
-.btn-modern-outline {
-    background: transparent;
-    color: var(--button-outline-color, #ffffff);
-    border: 2px solid var(--button-outline-color, rgba(255, 255, 255, 0.5));
-    padding: 1rem 2rem;
-    border-radius: 50px;
-    font-weight: 600;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
-}
-
-.btn-modern-outline:hover {
-    background: var(--button-primary-color, rgba(255, 255, 255, 0.1));
-    border-color: var(--button-primary-color, #ffffff);
-    color: var(--button-text-color, #ffffff);
-    transform: translateY(-2px);
-}
-
-.hero-image-container {
-    position: relative;
-    z-index: 2;
-    aspect-ratio: 16 / 9; /* keep nice ratio on desktop */
-}
-
-.hero-image {
-    width: 100%;
-    height: 500px;
     object-fit: cover;
-    border-radius: 20px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    display: block;
+    filter: saturate(1.08) contrast(1.02);
 }
 
-.hero-placeholder {
-    width: 100%;
-    height: 500px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    display: flex;
+.home-hero-media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(90deg, rgba(12, 19, 29, 0.92), rgba(12, 19, 29, 0.72) 42%, rgba(12, 19, 29, 0.2)),
+        linear-gradient(0deg, rgba(12, 19, 29, 0.86), rgba(12, 19, 29, 0) 58%);
+}
+
+.home-hero-grid {
+    position: relative;
+    z-index: 1;
+    min-height: calc(100vh - 118px);
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(340px, 0.56fr);
+    gap: clamp(28px, 5vw, 72px);
     align-items: center;
-    justify-content: center;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 42px 0 36px;
 }
 
-.hero-placeholder i {
-    font-size: 4rem;
-    color: rgba(255, 255, 255, 0.7);
+.home-kicker,
+.home-section-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--home-gold);
+    font-size: 0.82rem;
+    font-weight: 900;
+    text-transform: uppercase;
 }
 
-.hero-shapes {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: -1;
+.home-hero-copy h1 {
+    color: #ffffff;
+    max-width: 820px;
+    margin: 16px 0 22px;
+    font-size: clamp(2.75rem, 5vw, 5.25rem);
+    line-height: 1;
+    font-weight: 900;
 }
 
-.shape-1, .shape-2, .shape-3 {
-    position: absolute;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    animation: float 6s ease-in-out infinite;
+.home-hero-copy p {
+    max-width: 720px;
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 1.06rem;
+    line-height: 1.75;
+    margin: 0 0 26px;
 }
 
-.shape-1 {
-    width: 100px;
-    height: 100px;
-    top: 20%;
-    right: 10%;
-    animation-delay: 0s;
-}
-
-.shape-2 {
-    width: 60px;
-    height: 60px;
-    top: 60%;
-    left: 5%;
-    animation-delay: 2s;
-}
-
-.shape-3 {
-    width: 80px;
-    height: 80px;
-    bottom: 20%;
-    right: 20%;
-    animation-delay: 4s;
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-20px); }
-}
-
-/* Quick Access Section */
-.quick-access-section {
-    background: var(--section-bg-color, #f8f9fa);
-    padding: 1.5rem 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.quick-access-inner {
+.home-actions,
+.home-cta-actions {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
-    gap: 1rem;
+    gap: 12px;
 }
 
-.quick-access-item {
-    display: flex;
-    flex-direction: column;
+.home-btn {
+    min-height: 50px;
+    display: inline-flex;
     align-items: center;
-    padding: 1rem 1.25rem;
-    background: white;
-    border-radius: 16px;
+    justify-content: center;
+    gap: 10px;
+    border-radius: 12px;
+    padding: 0 18px;
+    font-weight: 900;
     text-decoration: none;
-    color: var(--primary-color);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    transition: all 0.3s ease;
-    min-width: 90px;
-    border: 1px solid rgba(0, 0, 0, 0.05);
+    border: 1px solid transparent;
 }
 
-.quick-access-item:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-    color: var(--primary-color);
+.home-btn-gold {
+    background: var(--home-gold);
+    color: #111827 !important;
 }
 
-.quick-access-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+.home-btn-glass {
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.32);
+    background: rgba(255, 255, 255, 0.11);
+    backdrop-filter: blur(16px);
+}
+
+.home-live-card {
+    border: 1px solid rgba(255, 255, 255, 0.26);
+    background: rgba(255, 255, 255, 0.13);
+    backdrop-filter: blur(24px);
+    border-radius: 22px;
+    padding: 18px;
+    box-shadow: var(--home-shadow);
+}
+
+.home-live-head {
     display: flex;
     align-items: center;
-    justify-content: center;
-    margin-bottom: 0.5rem;
+    justify-content: space-between;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.24);
 }
 
-.quick-access-icon i {
-    font-size: 1.5rem;
-    color: white;
+.home-live-head span,
+.home-live-grid span {
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 800;
 }
 
-.quick-access-title {
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-align: center;
-    line-height: 1.2;
+.home-live-head strong {
+    display: block;
+    color: #ffffff;
 }
 
-@media (max-width: 576px) {
-    .quick-access-inner {
-        gap: 0.75rem;
-    }
-    .quick-access-item {
-        min-width: 75px;
-        padding: 0.75rem 1rem;
-    }
-    .quick-access-icon {
-        width: 40px;
-        height: 40px;
-    }
-    .quick-access-icon i {
-        font-size: 1.25rem;
-    }
-    .quick-access-title {
-        font-size: 0.75rem;
-    }
-}
-
-/* Mobile optimizations: avoid image cropping */
-@media (max-width: 576px) {
-    /* Give space under the sticky header so the top of the slider is visible */
-    .modern-hero { padding-top: 100px; }
-    .carousel-item .row.align-items-center.min-vh-100 {
-        min-height: auto !important;
-    }
-    .hero-image-container {
-        aspect-ratio: auto;
-    }
-    .hero-image {
-        height: auto;
-        max-height: 55vh;
-        object-fit: contain; /* keep full image visible */
-        background: #f5f7fb; /* subtle background to fill space */
-    }
-    .hero-placeholder {
-        height: 40vh;
-    }
-    .hero-title { font-size: 2rem; }
-    .hero-description { font-size: 1rem; }
-    .hero-buttons { margin-bottom: 1.5rem; }
-}
-
-/* Modern Carousel Controls */
-.modern-indicators {
-    bottom: 2rem;
-}
-
-.modern-indicators button {
+.home-live-dot {
     width: 12px;
     height: 12px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.5);
-    border: none;
-    margin: 0 5px;
-    transition: all 0.3s ease;
+    border-radius: 999px;
+    background: #60d394;
+    box-shadow: 0 0 0 8px rgba(96, 211, 148, 0.18);
 }
 
-.modern-indicators button.active {
-    background: white;
-    transform: scale(1.2);
+.home-live-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 16px;
 }
 
-.modern-control {
+.home-live-grid div {
+    min-height: 104px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.13);
+    padding: 15px;
+}
+
+.home-live-grid b {
+    display: block;
+    color: #ffffff;
+    font-size: 2.4rem;
+    line-height: 1;
+}
+
+.home-live-grid span {
+    display: block;
+    margin-top: 8px;
+}
+
+.home-quick {
+    padding: 18px 0 0;
+    background: var(--home-paper);
+}
+
+.home-quick-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    border-radius: 24px;
+    background: #ffffff;
+    padding: 12px;
+    box-shadow: var(--home-shadow);
+}
+
+.home-quick-grid a {
+    min-height: 76px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-radius: 16px;
+    background: #f3f7f1;
+    padding: 14px;
+    color: var(--home-ink) !important;
+    font-weight: 900;
+    text-decoration: none;
+}
+
+.home-quick-grid i {
+    color: var(--home-green);
+    font-size: 1.4rem;
+}
+
+.home-section {
+    padding: 96px 0;
+}
+
+.home-story,
+.home-programs,
+.home-voices,
+.home-metric-band {
+    background: #ffffff;
+}
+
+.home-features,
+.home-activity {
+    background: var(--home-paper);
+}
+
+.home-section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 28px;
+    margin-bottom: 34px;
+}
+
+.home-section h2,
+.home-metrics-title h2,
+.home-footer-main h2 {
+    max-width: 920px;
+    margin: 10px 0 0;
+    font-size: clamp(1.95rem, 3.2vw, 3.55rem);
+    line-height: 1.04;
+    font-weight: 900;
+}
+
+.home-story-grid,
+.home-voices-grid {
+    display: grid;
+    grid-template-columns: minmax(340px, 0.8fr) minmax(0, 1.2fr);
+    gap: clamp(28px, 5vw, 72px);
+    align-items: start;
+}
+
+.home-story p {
+    margin: 0;
+    color: var(--home-muted);
+    font-size: 1.08rem;
+    line-height: 1.9;
+}
+
+.home-proof-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 28px;
+}
+
+.home-proof-grid div {
+    min-height: 138px;
+    border: 1px solid var(--home-line);
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 18px;
+    font-weight: 900;
+}
+
+.home-proof-grid i {
+    display: block;
+    color: var(--home-coral);
+    font-size: 1.45rem;
+    margin-bottom: 18px;
+}
+
+.home-feature-grid {
+    display: grid;
+    grid-template-columns: 1.25fr 1fr 1fr;
+    grid-auto-rows: minmax(190px, auto);
+    gap: 14px;
+}
+
+.home-feature-grid article {
+    border-radius: 20px;
+    border: 1px solid var(--home-line);
+    background: #ffffff;
+    padding: 24px;
+}
+
+.home-feature-grid article:first-child {
+    grid-row: span 2;
+    background: var(--home-deep);
+    color: #ffffff;
+}
+
+.home-feature-grid i {
     width: 50px;
     height: 50px;
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 50%;
-    border: 2px solid rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(10px);
-    transition: all 0.3s ease;
-    z-index: 15;
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-.modern-control:hover {
-    background: rgba(0, 0, 0, 0.5);
-    border-color: white;
-    transform: translateY(-50%) scale(1.1);
-}
-
-.modern-control .carousel-control-prev-icon,
-.modern-control .carousel-control-next-icon {
-    width: 0;
-    height: 0;
-    background: none;
-    border: none;
-    position: relative;
-}
-
-.modern-control .carousel-control-prev-icon::before {
-    content: '<';
-    font-size: 24px;
-    font-weight: bold;
-    color: white;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-.modern-control .carousel-control-next-icon::before {
-    content: '>';
-    font-size: 24px;
-    font-weight: bold;
-    color: white;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-/* Desktop carousel controls positioning */
-.carousel-control-prev {
-    left: -30px !important;
-}
-
-.carousel-control-next {
-    right: -30px !important;
-}
-
-/* Ensure controls are completely outside slide area */
-.carousel-control-prev,
-.carousel-control-next {
-    margin: 0 !important;
-    padding: 0 !important;
-    width: 50px !important;
-    height: 50px !important;
-}
-
-/* Additional positioning to ensure buttons are outside */
-.modern-hero .carousel-control-prev {
-    left: -30px !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-}
-
-.modern-hero .carousel-control-next {
-    right: -30px !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-}
-
-/* Mobile carousel controls */
-@media (max-width: 768px) {
-    .modern-control {
-        width: 40px !important;
-        height: 40px !important;
-        background: rgba(0, 0, 0, 0.3) !important;
-        border: 2px solid rgba(255, 255, 255, 0.8) !important;
-        border-radius: 50% !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        transition: all 0.3s ease !important;
-    }
-    
-    .modern-control:hover {
-        background: rgba(0, 0, 0, 0.5) !important;
-        border-color: white !important;
-        transform: scale(1.1) !important;
-    }
-    
-    .modern-control .carousel-control-prev-icon::before,
-    .modern-control .carousel-control-next-icon::before {
-        font-size: 20px !important;
-    }
-    
-    /* Position controls outside slide area on mobile */
-    .carousel-control-prev {
-        left: -10px !important;
-    }
-    
-    .carousel-control-next {
-        right: -10px !important;
-    }
-    
-    /* Reduce container padding on mobile */
-    .modern-hero .container {
-        padding: 0 20px !important;
-    }
-}
-
-/* Modern Sections */
-.modern-section {
-    padding: 3rem 0;
-    position: relative;
-    background-color: var(--section-bg-color, #f8f9fa);
-    color: var(--section-text-color, #333);
-}
-
-/* Stats Section */
-.stats-section {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-    color: white;
-}
-
-.stats-section .section-title,
-.stats-section .section-description {
-    color: white;
-}
-
-.stat-card-modern {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    padding: 2rem;
-    text-align: center;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    transition: all 0.3s ease;
-    height: 100%;
-}
-
-.stat-card-modern:hover {
-    transform: translateY(-10px);
-    background: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-}
-
-.stat-icon {
-    font-size: 3rem;
-    color: white;
-    margin-bottom: 1rem;
-}
-
-.stat-number {
-    font-size: 2.5rem;
-    font-weight: 800;
-    color: white;
-    margin-bottom: 0.5rem;
-}
-
-.stat-label {
-    font-size: 1rem;
-    color: rgba(255, 255, 255, 0.9);
-    font-weight: 500;
-}
-
-/* Features Section */
-.features-section {
-    background-color: white;
-}
-
-.feature-card-modern {
-    background: white;
-    border-radius: 20px;
-    padding: 2.5rem 2rem;
-    text-align: center;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    height: 100%;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.feature-card-modern:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-}
-
-.feature-icon {
-    width: 80px;
-    height: 80px;
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 1.5rem;
-    font-size: 2rem;
-    color: white;
-}
-
-.feature-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text-color, #333);
-    margin-bottom: 1rem;
-}
-
-.feature-description {
-    color: var(--text-muted, #666);
-    line-height: 1.6;
-    font-size: 1rem;
-}
-
-.section-header {
-    text-align: center;
-    margin-bottom: 2.5rem;
-}
-
-.section-badge {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    background: var(--badge-bg-color, var(--primary-color));
-    color: var(--badge-text-color, #ffffff);
-    padding: 0.5rem 1rem;
-    border-radius: 50px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
+    justify-content: center;
+    border-radius: 14px;
+    background: #edf4ef;
+    color: var(--home-green);
+    font-size: 1.45rem;
+    margin-bottom: 22px;
 }
 
-.section-title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    color: var(--primary-color);
-    margin-bottom: 1rem;
+.home-feature-grid h3,
+.home-news-grid h3 {
+    font-size: 1.08rem;
+    line-height: 1.42;
+    font-weight: 900;
 }
 
-.section-subtitle {
-    font-size: 1.1rem;
-    color: var(--section-text-color, #666);
-    max-width: 600px;
-    margin: 0 auto;
+.home-feature-grid p {
+    color: var(--home-muted);
+    line-height: 1.68;
 }
 
-/* Modern Cards */
-.modern-card {
-    background: var(--card-bg-color, #ffffff);
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    transition: all 0.3s ease;
-    border: 1px solid var(--card-border-color, rgba(0, 0, 0, 0.05));
-    height: 100%;
+.home-feature-grid article:first-child p,
+.home-feature-grid article:first-child h3 {
+    color: #ffffff;
 }
 
-.modern-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+.home-program-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.18fr) minmax(360px, 0.82fr);
+    grid-template-rows: minmax(250px, 30vh) minmax(250px, 30vh);
+    gap: 14px;
 }
 
-.card-image-container {
+.home-program-card,
+.home-news-grid article {
     position: relative;
     overflow: hidden;
-    height: 250px;
+    border-radius: 24px;
+    background: var(--home-deep);
 }
 
-.card-image {
+.home-program-card:first-child {
+    grid-row: span 2;
+}
+
+.home-program-card a,
+.home-news-grid a {
+    display: block;
+    height: 100%;
+    color: #ffffff !important;
+    text-decoration: none;
+}
+
+.home-program-card img,
+.home-news-grid img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.3s ease;
+    opacity: 0.82;
 }
 
-.modern-card:hover .card-image {
-    transform: scale(1.05);
-}
-
-.card-image-placeholder {
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 3rem;
-}
-
-.card-overlay {
+.home-program-card a::after {
+    content: "";
     position: absolute;
-    top: 0;
-    left: 0;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(10, 20, 28, 0.82), rgba(10, 20, 28, 0.02) 64%);
+}
+
+.home-program-card div {
+    position: absolute;
+    left: 22px;
+    right: 22px;
+    bottom: 20px;
+    z-index: 1;
+}
+
+.home-program-card small {
+    color: var(--home-gold);
+    font-weight: 900;
+}
+
+.home-program-card h3 {
+    font-size: 1.55rem;
+    margin: 8px 0 0;
+}
+
+.home-activity {
+    background: var(--home-deep);
+    color: #ffffff;
+}
+
+.home-activity h2 {
+    color: #ffffff;
+}
+
+.home-news-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.home-news-grid article {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.home-news-grid img,
+.home-news-grid a > span {
     width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: all 0.3s ease;
-}
-
-.modern-card:hover .card-overlay {
-    opacity: 1;
-}
-
-.btn-overlay {
-    background: var(--card-button-bg, #ffffff);
-    color: var(--card-button-text, var(--primary-color));
-    padding: 0.75rem 1.5rem;
-    border-radius: 50px;
-    text-decoration: none;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: all 0.3s ease;
-}
-
-.btn-overlay:hover {
-    background: var(--card-button-hover-bg, #f8f9fa);
-    color: var(--card-button-hover-text, var(--primary-color));
-    transform: scale(1.05);
-}
-
-.card-body-modern {
-    padding: 2rem;
-}
-
-.card-title-modern {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--section-text-color, #333);
-    margin-bottom: 1rem;
-    line-height: 1.4;
-}
-
-.card-text-modern {
-    color: var(--section-text-color, #666);
-    line-height: 1.6;
-    margin-bottom: 1.5rem;
-}
-
-.card-footer-modern {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: auto;
-}
-
-.btn-read-more {
-    color: var(--link-color, var(--primary-color));
-    text-decoration: none;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: all 0.3s ease;
-}
-
-.btn-read-more:hover {
-    color: var(--link-hover-color, var(--primary-color));
-    transform: translateX(5px);
-}
-
-/* Program Cards */
-.program-category {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--primary-color);
-    font-size: 0.9rem;
-    font-weight: 600;
-    margin-bottom: 1rem;
-}
-
-.btn-modern-card {
-    background: var(--card-button-bg, var(--primary-color));
-    color: var(--card-button-text, #ffffff);
-    padding: 0.75rem 1.5rem;
-    border-radius: 50px;
-    text-decoration: none;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: all 0.3s ease;
-}
-
-.btn-modern-card:hover {
-    background: var(--card-button-hover-bg, var(--secondary-color));
-    color: var(--card-button-hover-text, #ffffff);
-    transform: translateY(-2px);
-}
-
-/* Announcement Cards */
-.card-header-modern {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem 2rem 0;
-}
-
-.priority-badge {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border-radius: 50px;
-    font-size: 0.8rem;
-    font-weight: 600;
-}
-
-.priority-urgent {
-    background: #fee;
-    color: #dc3545;
-}
-
-.priority-high {
-    background: #fff3cd;
-    color: #856404;
-}
-
-.priority-normal {
-    background: #d1ecf1;
-    color: #0c5460;
-}
-
-.date-badge {
-    background: var(--card-bg-color, #f8f9fa);
-    color: var(--section-text-color, #666);
-    padding: 0.5rem 1rem;
-    border-radius: 50px;
-    font-size: 0.8rem;
-    font-weight: 600;
-}
-
-/* Post Cards */
-.post-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-}
-
-.category-badge {
-    padding: 0.25rem 0.75rem;
-    border-radius: 50px;
-    color: white;
-    font-size: 0.8rem;
-    font-weight: 600;
-}
-
-.post-date {
-    color: var(--section-text-color, #666);
-    font-size: 0.9rem;
-}
-
-/* Testimonial Cards */
-.testimonial-avatar {
-    margin-bottom: 1.5rem;
-}
-
-.avatar-image {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
+    aspect-ratio: 16 / 11;
     object-fit: cover;
-    border: 4px solid white;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-.avatar-placeholder {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: var(--primary-color);
+.home-news-grid a > span {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+}
+
+.home-news-grid div {
+    padding: 18px;
+}
+
+.home-news-grid time {
+    color: var(--home-gold);
+    font-size: 0.82rem;
+    font-weight: 900;
+}
+
+.home-news-grid h3 {
+    color: #ffffff;
+    margin: 10px 0 0;
+}
+
+.home-metric-band {
+    padding: 70px 0;
+}
+
+.home-metrics {
+    display: grid;
+    grid-template-columns: minmax(260px, 0.8fr) repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    align-items: stretch;
+}
+
+.home-metrics-title {
+    border-radius: 22px;
+    background: var(--home-green);
+    color: #ffffff;
+    padding: 24px;
+}
+
+.home-metrics-title h2 {
+    color: #ffffff;
     font-size: 2rem;
-    margin: 0 auto;
 }
 
-.testimonial-rating {
-    margin-bottom: 1rem;
+.home-metric {
+    border-radius: 22px;
+    background: var(--home-paper);
+    border: 1px solid var(--home-line);
+    padding: 22px;
 }
 
-.testimonial-rating i {
-    color: #ffc107;
-    font-size: 1.2rem;
-    margin: 0 0.1rem;
+.home-metric b {
+    display: block;
+    font-size: 2.6rem;
+    line-height: 1;
 }
 
-.testimonial-quote {
-    font-style: italic;
-    color: var(--section-text-color, #666);
-    margin-bottom: 1.5rem;
-    line-height: 1.6;
-    font-size: 1.1rem;
+.home-metric span {
+    display: block;
+    margin-top: 12px;
+    color: var(--home-muted);
+    font-weight: 900;
 }
 
-.author-name {
-    font-weight: 700;
-    color: var(--section-text-color, #333);
-    margin-bottom: 0.25rem;
+.home-voice-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
 }
 
-.author-title {
-    color: var(--section-text-color, #666);
-    font-size: 0.9rem;
+.home-voice-list figure {
     margin: 0;
+    border-radius: 20px;
+    background: #ffffff;
+    border: 1px solid var(--home-line);
+    padding: 24px;
 }
 
-/* Modern CTA */
-.modern-cta {
-    position: relative;
-    padding: 5rem 0;
-    overflow: hidden;
+.home-voice-list blockquote {
+    line-height: 1.8;
+    margin: 0 0 24px;
 }
 
-.cta-background {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-    z-index: -2;
-}
-
-.cta-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.3);
-    z-index: -1;
-}
-
-.cta-content {
-    color: white;
-}
-
-.cta-title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 1rem;
-    color: white;
-}
-
-.cta-description {
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
-    color: rgba(255, 255, 255, 0.9);
-    line-height: 1.6;
-}
-
-.cta-features {
-    display: flex;
-    gap: 2rem;
-    flex-wrap: wrap;
-}
-
-.feature-item {
+.home-voice-list figcaption {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    color: white;
-    font-weight: 500;
+    gap: 12px;
 }
 
-.feature-item i {
-    color: var(--accent-color);
-    font-size: 1.2rem;
-}
-
-.cta-actions {
+.home-voice-list img,
+.home-voice-list figcaption > span {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    object-fit: cover;
+    background: #e7f1ed;
+    color: var(--home-green);
     display: flex;
-    flex-direction: column;
-    gap: 1rem;
+    align-items: center;
+    justify-content: center;
 }
 
-.cta-actions .dropdown-menu-cta {
-    min-width: 220px;
-    border-radius: 12px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    padding: 0.5rem;
+.home-voice-list strong,
+.home-voice-list small {
+    display: block;
 }
 
-.cta-actions .dropdown-menu-cta .dropdown-item {
-    border-radius: 8px;
-    padding: 0.6rem 1rem;
+.home-voice-list small {
+    color: var(--home-muted);
 }
 
-.cta-actions .dropdown-menu-cta .dropdown-item:hover {
-    background-color: rgba(0, 0, 0, 0.05);
+.home-footer {
+    background: #101825;
+    color: #ffffff;
+    padding: 86px 0 28px;
 }
 
-.btn-modern-primary-large {
-    background: var(--button-primary-color, #ffffff);
-    color: var(--button-text-color, var(--primary-color));
-    padding: 1.25rem 2.5rem;
-    border-radius: 50px;
-    font-weight: 700;
+.home-footer-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1.16fr) minmax(460px, 0.84fr);
+    gap: clamp(24px, 4vw, 54px);
+    align-items: stretch;
+    margin-bottom: 42px;
+}
+
+.home-footer-main {
+    border-radius: 28px;
+    background:
+        linear-gradient(135deg, rgba(221, 169, 55, 0.18), rgba(18, 102, 79, 0.12)),
+        rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: clamp(28px, 5vw, 58px);
+}
+
+.home-footer-main h2 {
+    color: #ffffff;
+    max-width: 940px;
+    font-size: clamp(2rem, 3.6vw, 4rem);
+}
+
+.home-footer-main p {
+    max-width: 840px;
+    color: rgba(255, 255, 255, 0.72);
+    line-height: 1.85;
+    margin: 18px 0 0;
+}
+
+.home-footer-contact {
+    border-radius: 28px;
+    background: #ffffff;
+    color: var(--home-ink);
+    padding: 24px;
+    box-shadow: var(--home-shadow);
+}
+
+.home-footer-contact h3 {
+    margin: 0 0 8px;
+    font-size: 1.35rem;
+    font-weight: 900;
+}
+
+.home-footer-contact > p {
+    margin: 0 0 18px;
+    color: var(--home-muted);
+    line-height: 1.65;
+}
+
+.home-wa-options {
+    display: grid;
+    gap: 10px;
+}
+
+.home-wa-option {
+    display: grid;
+    grid-template-columns: 44px 1fr auto;
+    gap: 12px;
+    align-items: center;
+    border-radius: 16px;
+    background: #f5f7f2;
+    border: 1px solid var(--home-line);
+    padding: 12px;
+    color: var(--home-ink) !important;
     text-decoration: none;
+}
+
+.home-wa-option i {
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border-radius: 14px;
+    background: var(--home-green);
+    color: #ffffff;
+    font-size: 1.25rem;
 }
 
-.btn-modern-primary-large:hover {
-    background: var(--button-primary-hover, #0056b3);
-    color: var(--button-text-color, #ffffff);
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+.home-wa-option strong,
+.home-wa-option span {
+    display: block;
 }
 
-.btn-modern-outline-large {
-    background: linear-gradient(135deg, var(--button-primary-color, var(--primary-color)) 0%, var(--button-secondary-color, var(--secondary-color)) 100%);
-    color: var(--button-text-color, #ffffff);
-    border: none;
-    padding: 0.875rem 1.5rem;
-    border-radius: 50px;
-    font-weight: 700;
+.home-wa-option span span {
+    color: var(--home-muted);
+    font-size: 0.82rem;
+    margin-top: 3px;
+}
+
+.home-wa-option small {
+    color: var(--home-green);
+    font-weight: 900;
+}
+
+.home-footer-bottom {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr 0.8fr;
+    gap: 26px;
+    padding-top: 28px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.home-footer-brand {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+}
+
+.home-footer-brand img {
+    width: 54px;
+    height: 54px;
+    object-fit: contain;
+    border-radius: 14px;
+    background: #ffffff;
+    padding: 6px;
+}
+
+.home-footer-bottom h4 {
+    margin: 0 0 12px;
+    font-size: 0.95rem;
+    font-weight: 900;
+}
+
+.home-footer-bottom p,
+.home-footer-bottom a {
+    color: rgba(255, 255, 255, 0.68) !important;
+    line-height: 1.75;
+    font-size: 0.92rem;
     text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    width: auto;
-    max-width: fit-content;
 }
 
-.btn-modern-outline-large:hover {
-    background: linear-gradient(135deg, var(--button-primary-hover, var(--secondary-color)) 0%, var(--button-secondary-hover, var(--primary-color)) 100%);
-    color: var(--button-text-color, #ffffff);
-    transform: translateY(-3px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+.home-footer-links {
+    display: grid;
+    gap: 7px;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    .hero-title {
-        font-size: 2.5rem;
+@media (min-width: 1600px) {
+    .home-wrap {
+        width: min(1560px, calc(100% - 80px));
     }
-    
-    .hero-buttons {
-        flex-direction: column;
-    }
-    
-    .cta-features {
-        flex-direction: column;
-        gap: 1rem;
-    }
-    
-    .cta-actions {
-        margin-top: 2rem;
-    }
-    
-    .section-title {
-        font-size: 2rem;
-    }
-    
-    .modern-card {
-        margin-bottom: 2rem;
+
+    .home-hero-copy h1 {
+        font-size: 5.65rem;
     }
 }
 
-/* Pagination Styles */
-.pagination {
-    justify-content: center;
-    margin-top: 2rem;
+@media (max-width: 1180px) {
+    .home-hero-grid {
+        grid-template-columns: minmax(0, 1fr) 320px;
+    }
+
+    .home-hero-copy h1 {
+        font-size: clamp(2.65rem, 6vw, 4.6rem);
+    }
+
+    .home-footer-panel,
+    .home-metrics {
+        grid-template-columns: 1fr;
+    }
 }
 
-.pagination .page-link {
-    color: var(--link-color, var(--primary-color));
-    border-color: var(--link-color, var(--primary-color));
-    border-radius: 50px;
-    margin: 0 0.25rem;
-    padding: 0.75rem 1rem;
-    transition: all 0.3s ease;
+@media (max-width: 980px) {
+    .home-hero-grid,
+    .home-story-grid,
+    .home-footer-bottom,
+    .home-metrics,
+    .home-program-grid,
+    .home-voices-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .home-quick-grid,
+    .home-news-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .home-program-grid {
+        grid-template-rows: none;
+    }
+
+    .home-program-card,
+    .home-program-card:first-child {
+        grid-row: auto;
+        min-height: 280px;
+    }
+
+    .home-feature-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .home-feature-grid article:first-child {
+        grid-row: auto;
+    }
 }
 
-.pagination .page-link:hover {
-    background-color: var(--link-hover-color, var(--primary-color));
-    color: var(--button-text-color, #ffffff);
-    transform: translateY(-2px);
+@media (max-width: 640px) {
+    .home-wrap {
+        width: min(100% - 28px, 1440px);
+    }
+
+    .home-hero,
+    .home-hero-grid {
+        min-height: auto;
+    }
+
+    .home-hero-grid {
+        padding: 54px 0 34px;
+    }
+
+    .home-hero-copy h1 {
+        font-size: clamp(2.35rem, 12vw, 3.1rem);
+        line-height: 1.04;
+    }
+
+    .home-live-card {
+        display: none;
+    }
+
+    .home-quick-grid,
+    .home-proof-grid,
+    .home-metrics,
+    .home-news-grid,
+    .home-feature-grid,
+    .home-voice-list {
+        grid-template-columns: 1fr;
+    }
+
+    .home-section-head {
+        display: block;
+    }
+
+    .home-footer-panel {
+        gap: 18px;
+    }
+
+    .home-footer-contact {
+        padding: 18px;
+    }
+
+    .home-wa-option {
+        grid-template-columns: 40px 1fr;
+    }
+
+    .home-wa-option small {
+        grid-column: 2;
+    }
 }
 
-.pagination .page-item.active .page-link {
-    background-color: var(--link-hover-color, var(--primary-color));
-    border-color: var(--link-hover-color, var(--primary-color));
-    color: var(--button-text-color, #ffffff);
-}
+@media (max-width: 480px) {
+    .home-actions {
+        width: 100%;
+    }
 
-.pagination .page-item.disabled .page-link {
-    color: var(--section-text-color, #6c757d);
-    border-color: var(--card-border-color, #dee2e6);
+    .home-btn {
+        width: 100%;
+    }
 }
 </style>
-@endpush
-
-@push('scripts')
-<script>
-// Auto-hide alerts after 5 seconds
-setTimeout(function() {
-    $('.alert').fadeOut('slow');
-}, 5000);
-
-// Ensure carousel works on mobile
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize carousel manually
-    const carouselElement = document.querySelector('#heroCarousel');
-    if (carouselElement) {
-        // Initialize Bootstrap carousel (with Bootstrap check)
-        if (typeof bootstrap !== 'undefined' && bootstrap.Carousel) {
-            const carousel = new bootstrap.Carousel(carouselElement, {
-                interval: 5000,
-                wrap: true,
-                touch: true
-            });
-        } else {
-            console.warn('Bootstrap Carousel not available');
-        }
-        
-        // Add touch/swipe support for mobile
-        let startX = 0;
-        let startY = 0;
-        let endX = 0;
-        let endY = 0;
-        
-        carouselElement.addEventListener('touchstart', function(e) {
-            startX = e.touches[0].clientX;
-            startY = e.touches[0].clientY;
-        });
-        
-        carouselElement.addEventListener('touchend', function(e) {
-            endX = e.changedTouches[0].clientX;
-            endY = e.changedTouches[0].clientY;
-            
-            const diffX = startX - endX;
-            const diffY = startY - endY;
-            
-            // Only trigger if horizontal swipe is more significant than vertical
-            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
-                if (diffX > 0) {
-                    // Swipe left - next slide
-                    carousel.next();
-                } else {
-                    // Swipe right - previous slide
-                    carousel.prev();
-                }
-            }
-        });
-        
-        // Ensure control buttons work
-        const prevButton = carouselElement.querySelector('.carousel-control-prev');
-        const nextButton = carouselElement.querySelector('.carousel-control-next');
-        
-        if (prevButton) {
-            prevButton.addEventListener('click', function(e) {
-                e.preventDefault();
-                carousel.prev();
-            });
-        }
-        
-        if (nextButton) {
-            nextButton.addEventListener('click', function(e) {
-                e.preventDefault();
-                carousel.next();
-            });
-        }
-    }
-});
-</script>
 @endpush

@@ -14,6 +14,7 @@ use App\Models\Testimonial;
 use App\Models\Statistic;
 use App\Models\Feature;
 use App\Models\QuickLink;
+use App\Models\InstitutionContact;
 
 class HomeController extends Controller
 {
@@ -39,6 +40,7 @@ class HomeController extends Controller
             $statistics = Statistic::active()->ordered()->get();
             $features = Feature::active()->ordered()->get();
             $quickLinks = QuickLink::active()->ordered()->get();
+            $institutionContacts = InstitutionContact::active()->ordered()->get();
 
             return view('home', compact(
                 'siteSettings',
@@ -52,7 +54,8 @@ class HomeController extends Controller
                 'testimonials',
                 'statistics',
                 'features',
-                'quickLinks'
+                'quickLinks',
+                'institutionContacts'
             ));
         } catch (\Exception $e) {
             // Log the error
@@ -72,6 +75,7 @@ class HomeController extends Controller
                 'statistics' => collect(),
                 'features' => collect(),
                 'quickLinks' => collect(),
+                'institutionContacts' => collect(),
                 'error' => 'Database connection error. Please check your configuration.'
             ]);
         }

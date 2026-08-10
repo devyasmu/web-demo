@@ -154,6 +154,13 @@
                                 Akses Cepat
                             </a>
                         </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.institution-contacts*') ? 'active' : '' }}" href="{{ route('admin.institution-contacts.index') }}">
+                                <i class="bi bi-whatsapp"></i>
+                                CP Lembaga
+                            </a>
+                        </li>
                         
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.pages*') ? 'active' : '' }}" href="{{ route('admin.pages.index') }}">

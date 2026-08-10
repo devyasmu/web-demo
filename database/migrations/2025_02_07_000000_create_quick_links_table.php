@@ -11,15 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('quick_links', function (Blueprint $table) {
-            $table->id();
-            $table->string('title');
-            $table->string('url');
-            $table->string('icon')->default('bi bi-link-45deg');
-            $table->unsignedInteger('order')->default(0);
-            $table->boolean('is_active')->default(true);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('quick_links')) {
+            Schema::create('quick_links', function (Blueprint $table) {
+                $table->id();
+                $table->string('title');
+                $table->string('url');
+                $table->string('icon')->default('bi bi-link-45deg');
+                $table->unsignedInteger('order')->default(0);
+                $table->boolean('is_active')->default(true);
+                $table->timestamps();
+            });
+        }
     }
 
     /**

@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('quick_links', function (Blueprint $table) {
-            $table->string('image')->nullable()->after('icon');
-        });
+        if (Schema::hasTable('quick_links') && !Schema::hasColumn('quick_links', 'image')) {
+            Schema::table('quick_links', function (Blueprint $table) {
+                $table->string('image')->nullable()->after('icon');
+            });
+        }
     }
 
     /**
@@ -21,8 +23,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('quick_links', function (Blueprint $table) {
-            $table->dropColumn('image');
-        });
+        if (Schema::hasTable('quick_links') && Schema::hasColumn('quick_links', 'image')) {
+            Schema::table('quick_links', function (Blueprint $table) {
+                $table->dropColumn('image');
+            });
+        }
     }
 };
