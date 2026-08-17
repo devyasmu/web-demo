@@ -43,7 +43,7 @@ class MenuController extends Controller
 
         \App\Models\Menu::create($data);
 
-        return redirect()->route('menus.index')
+        return redirect()->route('admin.menus.index')
             ->with('success', 'Menu berhasil ditambahkan.');
     }
 
@@ -82,7 +82,7 @@ class MenuController extends Controller
 
         $menu->update($data);
 
-        return redirect()->route('menus.index')
+        return redirect()->route('admin.menus.index')
             ->with('success', 'Menu berhasil diperbarui.');
     }
 
@@ -92,7 +92,7 @@ class MenuController extends Controller
     public function destroy(\App\Models\Menu $menu)
     {
         $menu->delete();
-        return redirect()->route('menus.index')
+        return redirect()->route('admin.menus.index')
             ->with('success', 'Menu berhasil dihapus.');
     }
 }
