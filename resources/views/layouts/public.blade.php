@@ -683,6 +683,13 @@
                 font-size: 1.35rem;
             }
         }
+
+        @media (min-width: 768px) and (max-width: 991.98px) {
+            .scroll-to-top-btn {
+                bottom: 92px;
+                right: 24px;
+            }
+        }
         
         .scroll-to-top-btn.visible {
             display: flex;
@@ -700,6 +707,7 @@
         
         /* Bottom mobile wrapper */
         .bottom-mobile-wrapper {
+            display: none;
             position: fixed;
             bottom: 0;
             left: 0;
@@ -715,6 +723,12 @@
         .bottom-mobile-nav .d-flex {
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
+        }
+
+        @media (max-width: 991.98px) {
+            .bottom-mobile-wrapper {
+                display: block;
+            }
         }
     </style>
     
@@ -841,7 +855,7 @@
     </button>
 
     <!-- Bottom Mobile Nav (mobile only) -->
-    <div class="d-md-none bottom-mobile-wrapper">
+    <div class="bottom-mobile-wrapper">
         <nav class="bottom-mobile-nav">
         <div class="container px-0">
             <div class="d-flex flex-nowrap overflow-auto text-center" style="-webkit-overflow-scrolling: touch; scrollbar-width: none;">
