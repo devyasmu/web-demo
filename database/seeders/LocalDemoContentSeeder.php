@@ -37,8 +37,8 @@ class LocalDemoContentSeeder extends Seeder
 
     public function run(): void
     {
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@yayasan.com'],
+        $admin = User::updateOrCreate(
+            ['email' => 'admin@webdemo.test'],
             ['name' => 'Administrator', 'password' => Hash::make('password')]
         );
 
@@ -62,9 +62,9 @@ class LocalDemoContentSeeder extends Seeder
     private function ensureStorageAssets(): void
     {
         $assets = [
-            'logos/ey01AVwQYYFQ8z9eD4oclpbuFeLKMjOw4CVVtt07.png' => 'YASMU',
-            'favicons/sknmLgLozzgp1tUCyF0gpyQyEiKmowNvfztgABd4.png' => 'YM',
-            'demo/sliders/gerbang-yasmu.png' => 'Gerbang YASMU',
+            'demo/logos/web-demo-logo.png' => 'Web Demo',
+            'demo/favicons/web-demo-favicon.png' => 'WD',
+            'demo/sliders/gerbang-demo.png' => 'Gerbang Demo',
             'demo/sliders/kegiatan-belajar.png' => 'Kegiatan Belajar',
             'demo/sliders/tahfidz-prestasi.png' => 'Tahfidz Prestasi',
             'demo/sliders/lab-komputer.png' => 'Lab Komputer',
@@ -93,9 +93,9 @@ class LocalDemoContentSeeder extends Seeder
             $this->makeImage($path, $label);
         }
 
-        Storage::disk('public')->put('demo/downloads/brosur-ppdb.pdf', $this->minimalPdf('Brosur PPDB YASMU Manyar'));
-        Storage::disk('public')->put('demo/downloads/kalender-akademik.pdf', $this->minimalPdf('Kalender Akademik YASMU Manyar'));
-        Storage::disk('public')->put('demo/downloads/formulir-pendaftaran.pdf', $this->minimalPdf('Formulir Pendaftaran YASMU Manyar'));
+        Storage::disk('public')->put('demo/downloads/brosur-ppdb.pdf', $this->minimalPdf('Brosur PPDB Web Demo Pendidikan'));
+        Storage::disk('public')->put('demo/downloads/kalender-akademik.pdf', $this->minimalPdf('Kalender Akademik Web Demo Pendidikan'));
+        Storage::disk('public')->put('demo/downloads/formulir-pendaftaran.pdf', $this->minimalPdf('Formulir Pendaftaran Web Demo Pendidikan'));
     }
 
     private function makeImage(string $path, string $label): void
@@ -127,7 +127,7 @@ class LocalDemoContentSeeder extends Seeder
         imagefilledrectangle($image, 0, 0, $width, $height, $darkOverlay);
 
         $font = 5;
-        $line1 = 'YASMU Manyar';
+        $line1 = 'Web Demo Pendidikan';
         $line2 = Str::limit($label, 32, '');
         imagestring($image, $font, 54, (int) ($height / 2) - 28, $line1, $white);
         imagestring($image, $font, 54, (int) ($height / 2) + 4, $line2, $white);
@@ -177,28 +177,41 @@ class LocalDemoContentSeeder extends Seeder
         $settings = SiteSetting::first();
         if (!$settings) {
             SiteSetting::create([
-                'site_name' => 'YASMU Manyar Gresik',
-                'site_description' => 'Yayasan pendidikan Islam di Manyar Gresik.',
-                'logo' => 'logos/ey01AVwQYYFQ8z9eD4oclpbuFeLKMjOw4CVVtt07.png',
-                'favicon' => 'favicons/sknmLgLozzgp1tUCyF0gpyQyEiKmowNvfztgABd4.png',
-                'email' => 'info@yasmumanyar.or.id',
-                'phone' => '085785377790',
-                'address' => 'Manyar Gresik, Jawa Timur',
+                'site_name' => 'Web Demo Pendidikan',
+                'site_tagline' => 'Template website sekolah dan yayasan siap pakai',
+                'site_description' => 'Website demo pendidikan yang siap disesuaikan untuk profil lembaga, berita, galeri, download, dan layanan informasi.',
+                'logo' => 'demo/logos/web-demo-logo.png',
+                'favicon' => 'demo/favicons/web-demo-favicon.png',
+                'email' => 'admin@webdemo.test',
+                'phone' => '081234567890',
+                'address' => 'Jl. Demo Pendidikan No. 1, Kota Demo',
             ]);
 
             return;
         }
 
         $settings->forceFill([
-            'logo' => $settings->logo ?: 'logos/ey01AVwQYYFQ8z9eD4oclpbuFeLKMjOw4CVVtt07.png',
-            'favicon' => $settings->favicon ?: 'favicons/sknmLgLozzgp1tUCyF0gpyQyEiKmowNvfztgABd4.png',
+            'site_name' => 'Web Demo Pendidikan',
+            'site_tagline' => 'Template website sekolah dan yayasan siap pakai',
+            'site_description' => 'Website demo pendidikan yang siap disesuaikan untuk profil lembaga, berita, galeri, download, dan layanan informasi.',
+            'logo' => 'demo/logos/web-demo-logo.png',
+            'favicon' => 'demo/favicons/web-demo-favicon.png',
+            'email' => 'admin@webdemo.test',
+            'phone' => '081234567890',
+            'address' => 'Jl. Demo Pendidikan No. 1, Kota Demo',
+            'facebook' => 'https://example.com/webdemo-facebook',
+            'instagram' => 'https://example.com/webdemo-instagram',
+            'youtube' => 'https://example.com/webdemo-youtube',
+            'meta_title' => 'Web Demo Pendidikan - Website Sekolah Siap Pakai',
+            'meta_description' => 'Website demo pendidikan yang siap disesuaikan untuk profil lembaga, berita, galeri, download, dan layanan informasi.',
+            'meta_keywords' => 'web demo, pendidikan, sekolah, yayasan, berita, galeri, download',
         ])->save();
     }
 
     private function seedSliders(): void
     {
         $sliders = [
-            ['title' => 'Pendidikan Islam Terpadu di Manyar', 'description' => 'Lingkungan belajar yang hangat, disiplin, dan dekat dengan nilai keislaman.', 'image' => 'demo/sliders/gerbang-yasmu.png', 'button_text' => 'Lihat Program', 'button_link' => '/programs'],
+            ['title' => 'Website Demo Pendidikan Siap Dipakai', 'description' => 'Tampilan profil, program, berita, galeri, download, dan kontak sudah terisi data contoh.', 'image' => 'demo/sliders/gerbang-demo.png', 'button_text' => 'Lihat Program', 'button_link' => '/programs'],
             ['title' => 'Kegiatan Belajar Aktif dan Terarah', 'description' => 'Siswa bertumbuh melalui pembelajaran kelas, proyek, dan pembiasaan karakter.', 'image' => 'demo/sliders/kegiatan-belajar.png', 'button_text' => 'Baca Berita', 'button_link' => '/posts'],
             ['title' => 'Tahfidz dan Prestasi Berjalan Seimbang', 'description' => 'Pembinaan Al-Quran, akademik, dan minat bakat disiapkan secara bertahap.', 'image' => 'demo/sliders/tahfidz-prestasi.png', 'button_text' => 'Daftar PPDB', 'button_link' => '/contact'],
             ['title' => 'Keterampilan Digital untuk Masa Depan', 'description' => 'Fasilitas belajar mendukung literasi teknologi dan kreativitas siswa.', 'image' => 'demo/sliders/lab-komputer.png', 'button_text' => 'Lihat Galeri', 'button_link' => '/galleries'],
@@ -212,7 +225,7 @@ class LocalDemoContentSeeder extends Seeder
     private function seedRunningTexts(): void
     {
         $texts = [
-            ['text' => 'PPDB YASMU Manyar tahun ajaran baru telah dibuka. Hubungi admin untuk jadwal observasi.', 'link' => '/contact'],
+            ['text' => 'PPDB Web Demo Pendidikan tahun ajaran baru telah dibuka. Hubungi admin untuk jadwal observasi.', 'link' => '/contact'],
             ['text' => 'Simak berita kegiatan siswa terbaru melalui menu Berita dan Galeri.', 'link' => '/posts'],
             ['text' => 'Unduh kalender akademik dan formulir pendaftaran di menu Download.', 'link' => '/downloads'],
         ];
@@ -233,9 +246,9 @@ class LocalDemoContentSeeder extends Seeder
         foreach ($pages as $page) {
             Page::updateOrCreate(['slug' => $page['slug']], [
                 'title' => $page['title'],
-                'content' => '<h2>' . e($page['title']) . '</h2><p>YASMU Manyar Gresik berkomitmen membangun layanan pendidikan Islam yang tertib, ramah, dan relevan dengan kebutuhan keluarga masa kini.</p><p>Konten ini adalah data contoh untuk pengisian lokal dan dapat diedit dari halaman admin.</p>',
-                'meta_title' => $page['title'] . ' - YASMU Manyar Gresik',
-                'meta_description' => 'Informasi ' . strtolower($page['title']) . ' YASMU Manyar Gresik.',
+                'content' => '<h2>' . e($page['title']) . '</h2><p>Web Demo Pendidikan berkomitmen membangun layanan pendidikan Islam yang tertib, ramah, dan relevan dengan kebutuhan keluarga masa kini.</p><p>Konten ini adalah data contoh untuk pengisian lokal dan dapat diedit dari halaman admin.</p>',
+                'meta_title' => $page['title'] . ' - Web Demo Pendidikan',
+                'meta_description' => 'Informasi ' . strtolower($page['title']) . ' Web Demo Pendidikan.',
                 'is_active' => true,
             ]);
         }
@@ -271,8 +284,8 @@ class LocalDemoContentSeeder extends Seeder
     {
         $categoryIds = Category::pluck('id', 'slug');
         $posts = [
-            ['title' => 'PPDB YASMU Manyar Dibuka dengan Layanan Konsultasi Orang Tua', 'category' => 'berita', 'image' => 'demo/posts/ppdb.png'],
-            ['title' => 'Siswa YASMU Raih Prestasi Lomba Akademik Tingkat Kabupaten', 'category' => 'prestasi', 'image' => 'demo/posts/prestasi-santri.png'],
+            ['title' => 'PPDB Web Demo Pendidikan Dibuka dengan Layanan Konsultasi Orang Tua', 'category' => 'berita', 'image' => 'demo/posts/ppdb.png'],
+            ['title' => 'Siswa Demo Raih Prestasi Lomba Akademik Tingkat Kabupaten', 'category' => 'prestasi', 'image' => 'demo/posts/prestasi-santri.png'],
             ['title' => 'Kelas Inspirasi Mengenalkan Profesi dan Adab Bekerja', 'category' => 'kegiatan', 'image' => 'demo/posts/kelas-inspirasi.png'],
             ['title' => 'Bakti Sosial Melatih Kepedulian Siswa kepada Lingkungan', 'category' => 'kegiatan', 'image' => 'demo/posts/bakti-sosial.png'],
             ['title' => 'Pelatihan Guru Menguatkan Pembelajaran Berbasis Proyek', 'category' => 'berita', 'image' => 'demo/posts/pelatihan-guru.png'],
@@ -282,13 +295,13 @@ class LocalDemoContentSeeder extends Seeder
         foreach ($posts as $index => $post) {
             Post::updateOrCreate(['slug' => Str::slug($post['title'])], [
                 'title' => $post['title'],
-                'excerpt' => 'Ringkasan artikel contoh untuk mengisi halaman berita lokal YASMU Manyar.',
+                'excerpt' => 'Ringkasan artikel contoh untuk mengisi halaman berita lokal Web Demo Pendidikan.',
                 'content' => '<p>Artikel ini merupakan konten contoh untuk melihat tampilan halaman berita, kartu artikel, dan detail berita.</p><p>Admin dapat mengganti judul, foto, isi artikel, kategori, dan status publikasi kapan saja dari dashboard.</p>',
                 'featured_image' => $post['image'],
                 'category_id' => $categoryIds[$post['category']] ?? Category::first()->id,
                 'user_id' => $admin->id,
                 'meta_title' => $post['title'],
-                'meta_description' => 'Artikel contoh YASMU Manyar Gresik.',
+                'meta_description' => 'Artikel contoh Web Demo Pendidikan.',
                 'is_published' => true,
                 'is_featured' => $index < 3,
                 'views' => rand(35, 420),
@@ -301,7 +314,7 @@ class LocalDemoContentSeeder extends Seeder
     {
         $categoryId = Category::where('slug', 'galeri')->value('id');
         $galleries = [
-            ['title' => 'Upacara dan Pembiasaan Pagi', 'image' => 'demo/galleries/upacara.png', 'location' => 'Halaman YASMU'],
+            ['title' => 'Upacara dan Pembiasaan Pagi', 'image' => 'demo/galleries/upacara.png', 'location' => 'Halaman Demo'],
             ['title' => 'Kegiatan Olahraga dan Kesehatan', 'image' => 'demo/galleries/olahraga.png', 'location' => 'Lapangan Sekolah'],
             ['title' => 'Latihan Pramuka dan Kepemimpinan', 'image' => 'demo/galleries/pramuka.png', 'location' => 'Area Sekolah'],
             ['title' => 'Suasana Belajar di Kelas', 'image' => 'demo/galleries/kelas.png', 'location' => 'Ruang Kelas'],
@@ -311,7 +324,7 @@ class LocalDemoContentSeeder extends Seeder
             Gallery::updateOrCreate(['slug' => Str::slug($gallery['title'])], [
                 'title' => $gallery['title'],
                 'description' => 'Foto dokumentasi contoh untuk mengisi galeri lokal.',
-                'content' => '<p>Galeri ini berisi dokumentasi contoh kegiatan siswa YASMU Manyar.</p>',
+                'content' => '<p>Galeri ini berisi dokumentasi contoh kegiatan siswa Web Demo Pendidikan.</p>',
                 'image' => $gallery['image'],
                 'featured_image' => $gallery['image'],
                 'thumbnail' => $gallery['image'],
@@ -350,7 +363,7 @@ class LocalDemoContentSeeder extends Seeder
     {
         $categoryId = Category::where('slug', 'dokumen')->value('id');
         $downloads = [
-            ['title' => 'Brosur PPDB YASMU Manyar', 'file' => 'demo/downloads/brosur-ppdb.pdf'],
+            ['title' => 'Brosur PPDB Web Demo Pendidikan', 'file' => 'demo/downloads/brosur-ppdb.pdf'],
             ['title' => 'Kalender Akademik Tahun Pelajaran', 'file' => 'demo/downloads/kalender-akademik.pdf'],
             ['title' => 'Formulir Pendaftaran Siswa Baru', 'file' => 'demo/downloads/formulir-pendaftaran.pdf'],
         ];
@@ -372,7 +385,7 @@ class LocalDemoContentSeeder extends Seeder
     private function seedFaqs(): void
     {
         $faqs = [
-            ['question' => 'Bagaimana cara mendaftar siswa baru?', 'answer' => 'Pendaftaran dapat dilakukan melalui kontak admin atau datang langsung ke kantor YASMU Manyar dengan membawa dokumen dasar calon siswa.'],
+            ['question' => 'Bagaimana cara mendaftar siswa baru?', 'answer' => 'Pendaftaran dapat dilakukan melalui kontak admin atau datang langsung ke kantor Web Demo Pendidikan dengan membawa dokumen dasar calon siswa.'],
             ['question' => 'Apakah tersedia konsultasi pilihan jenjang?', 'answer' => 'Ya, wali siswa dapat berkonsultasi dengan admin PPDB untuk memilih jenjang dan program yang sesuai.'],
             ['question' => 'Dokumen apa saja yang perlu disiapkan?', 'answer' => 'Dokumen umum meliputi akta kelahiran, kartu keluarga, pas foto, rapor terakhir, dan dokumen pendukung lain sesuai jenjang.'],
             ['question' => 'Di mana informasi terbaru bisa dilihat?', 'answer' => 'Informasi terbaru tersedia melalui halaman Berita, Pengumuman, Download, dan kontak resmi yayasan.'],
@@ -392,14 +405,14 @@ class LocalDemoContentSeeder extends Seeder
         $testimonials = [
             ['name' => 'Ibu Nur Aini', 'position' => 'Wali Siswa', 'company' => 'SMP', 'photo' => 'demo/testimonials/wali-1.png'],
             ['name' => 'Ahmad Fikri', 'position' => 'Alumni', 'company' => 'Angkatan 2023', 'photo' => 'demo/testimonials/alumni-1.png'],
-            ['name' => 'Ustadzah Laila', 'position' => 'Guru Pendamping', 'company' => 'YASMU', 'photo' => 'demo/testimonials/guru-1.png'],
+            ['name' => 'Ustadzah Laila', 'position' => 'Guru Pendamping', 'company' => 'Demo', 'photo' => 'demo/testimonials/guru-1.png'],
         ];
 
         foreach ($testimonials as $index => $testimonial) {
             Testimonial::updateOrCreate(['name' => $testimonial['name']], [
                 'position' => $testimonial['position'],
                 'company' => $testimonial['company'],
-                'testimonial' => 'Konten contoh: lingkungan belajar YASMU terasa tertib, komunikatif, dan membantu siswa bertumbuh dengan nilai Islam.',
+                'testimonial' => 'Konten contoh: lingkungan belajar Demo terasa tertib, komunikatif, dan membantu siswa bertumbuh dengan nilai Islam.',
                 'photo' => $testimonial['photo'],
                 'rating' => 5,
                 'is_featured' => true,
@@ -448,12 +461,12 @@ class LocalDemoContentSeeder extends Seeder
     private function seedInstitutionContacts(): void
     {
         $contacts = [
-            ['name' => 'Yayasan', 'contact_person' => 'Admin Yayasan', 'phone' => '085785377790', 'description' => 'Informasi umum dan kemitraan'],
-            ['name' => 'MTs', 'contact_person' => 'Admin MTs', 'phone' => '085785377790', 'description' => 'Informasi jenjang madrasah tsanawiyah'],
-            ['name' => 'SMP', 'contact_person' => 'Admin SMP', 'phone' => '085785377790', 'description' => 'Informasi jenjang sekolah menengah pertama'],
-            ['name' => 'MA', 'contact_person' => 'Admin MA', 'phone' => '085785377790', 'description' => 'Informasi jenjang madrasah aliyah'],
-            ['name' => 'SMA', 'contact_person' => 'Admin SMA', 'phone' => '085785377790', 'description' => 'Informasi jenjang sekolah menengah atas'],
-            ['name' => 'SMK', 'contact_person' => 'Admin SMK', 'phone' => '085785377790', 'description' => 'Informasi jenjang sekolah menengah kejuruan'],
+            ['name' => 'Yayasan', 'contact_person' => 'Admin Yayasan', 'phone' => '081234567890', 'description' => 'Informasi umum dan kemitraan'],
+            ['name' => 'MTs', 'contact_person' => 'Admin MTs', 'phone' => '081234567890', 'description' => 'Informasi jenjang madrasah tsanawiyah'],
+            ['name' => 'SMP', 'contact_person' => 'Admin SMP', 'phone' => '081234567890', 'description' => 'Informasi jenjang sekolah menengah pertama'],
+            ['name' => 'MA', 'contact_person' => 'Admin MA', 'phone' => '081234567890', 'description' => 'Informasi jenjang madrasah aliyah'],
+            ['name' => 'SMA', 'contact_person' => 'Admin SMA', 'phone' => '081234567890', 'description' => 'Informasi jenjang sekolah menengah atas'],
+            ['name' => 'SMK', 'contact_person' => 'Admin SMK', 'phone' => '081234567890', 'description' => 'Informasi jenjang sekolah menengah kejuruan'],
         ];
 
         foreach ($contacts as $index => $contact) {

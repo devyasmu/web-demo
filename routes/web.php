@@ -99,8 +99,8 @@ Route::get('/sejarah-yayasan', function() {
 
 // Custom Auth Routes (hanya login dan logout) - URL tersembunyi untuk keamanan
 // URL login diubah untuk mencegah brute force dan scanning
-Route::get('/admin-access-2024', [App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/admin-access-2024', [App\Http\Controllers\Auth\LoginController::class, 'login'])->middleware('throttle:5,1');
+Route::get('/masuk-admin', [App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])->name('login');
+Route::post('/masuk-admin', [App\Http\Controllers\Auth\LoginController::class, 'login'])->middleware('throttle:5,1');
 Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logout'])->name('logout');
 
 // Admin Routes - guest yang akses /admin dapat 404 (URL login harus diketik manual)

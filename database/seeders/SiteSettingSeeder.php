@@ -12,19 +12,21 @@ class SiteSettingSeeder extends Seeder
      */
     public function run(): void
     {
-        \App\Models\SiteSetting::create([
-            'site_name' => 'Yayasan Pendidikan Islam',
-            'site_tagline' => 'Membangun Generasi Berkarakter dan Berprestasi',
-            'site_description' => 'Yayasan Pendidikan Islam yang berkomitmen untuk memberikan pendidikan berkualitas dengan nilai-nilai Islam yang kuat.',
-            'email' => 'info@yayasanpendidikan.com',
-            'phone' => '+62 21 1234 5678',
-            'address' => 'Jl. Pendidikan No. 123, Jakarta Selatan 12345',
-            'facebook' => 'https://facebook.com/yayasanpendidikan',
-            'instagram' => 'https://instagram.com/yayasanpendidikan',
-            'youtube' => 'https://youtube.com/yayasanpendidikan',
-            'meta_title' => 'Yayasan Pendidikan Islam - Membangun Generasi Berkarakter',
-            'meta_description' => 'Yayasan Pendidikan Islam yang berkomitmen untuk memberikan pendidikan berkualitas dengan nilai-nilai Islam yang kuat.',
-            'meta_keywords' => 'yayasan, pendidikan, islam, sekolah, madrasah, karakter, prestasi',
+        \App\Models\SiteSetting::updateOrCreate(['id' => 1], [
+            'site_name' => 'Web Demo Pendidikan',
+            'site_tagline' => 'Template website sekolah dan yayasan siap pakai',
+            'site_description' => 'Website demo pendidikan yang siap disesuaikan untuk profil lembaga, berita, galeri, download, dan layanan informasi.',
+            'email' => 'admin@webdemo.test',
+            'phone' => '081234567890',
+            'address' => 'Jl. Demo Pendidikan No. 1, Kota Demo',
+            'facebook' => 'https://example.com/webdemo-facebook',
+            'instagram' => 'https://example.com/webdemo-instagram',
+            'youtube' => 'https://example.com/webdemo-youtube',
+            'meta_title' => 'Web Demo Pendidikan - Website Sekolah Siap Pakai',
+            'meta_description' => 'Website demo pendidikan yang siap disesuaikan untuk profil lembaga, berita, galeri, download, dan layanan informasi.',
+            'meta_keywords' => 'web demo, pendidikan, sekolah, yayasan, berita, galeri, download',
+            'logo' => 'demo/logos/web-demo-logo.png',
+            'favicon' => 'demo/favicons/web-demo-favicon.png',
             // Theme Colors
             'primary_color' => '#007bff',
             'secondary_color' => '#6c757d',

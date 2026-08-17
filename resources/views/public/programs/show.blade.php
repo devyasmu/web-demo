@@ -105,7 +105,7 @@
                         </p>
                         <p class="mb-2">
                             <i class="bi bi-envelope me-2"></i>
-                            <strong>Email:</strong> {{ $siteSettings->email ?? 'info@yayasan.com' }}
+                            <strong>Email:</strong> {{ $siteSettings->email ?? 'admin@webdemo.test' }}
                         </p>
                         <p class="mb-0">
                             <i class="bi bi-geo-alt me-2"></i>

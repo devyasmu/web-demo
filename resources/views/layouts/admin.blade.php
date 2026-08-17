@@ -8,7 +8,7 @@
     <!-- Favicon -->
     @php
         $siteSettings = \App\Models\SiteSetting::first();
-        $siteName = $siteSettings->site_name ?? config('app.name', 'YASMU Manyar Gresik');
+        $siteName = $siteSettings->site_name ?? config('app.name', 'Web Demo Pendidikan');
     @endphp
     <title>@yield('title', 'Admin Panel') - {{ $siteName }}</title>
     @if($siteSettings && $siteSettings->favicon)

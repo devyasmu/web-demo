@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
-@section('title', $siteSettings->site_name ?? 'Yayasan Pendidikan Islam')
-@section('description', $siteSettings->site_description ?? 'Yayasan Pendidikan Islam yang berkomitmen untuk memberikan pendidikan berkualitas dengan nilai-nilai Islam yang kuat.')
+@section('title', $siteSettings->site_name ?? 'Web Demo Pendidikan')
+@section('description', $siteSettings->site_description ?? 'Website demo pendidikan yang siap disesuaikan untuk profil lembaga, berita, galeri, dan layanan informasi.')
 
 @if(isset($error))
 <div class="alert alert-danger" role="alert">
@@ -90,7 +90,7 @@
         <div class="row align-items-center min-vh-100">
             <div class="col-lg-5">
                 <div class="hero-content modern-content">
-                    <h1 class="hero-title">Selamat Datang di {{ $siteSettings->site_name ?? 'Yayasan Pendidikan Islam' }}</h1>
+                    <h1 class="hero-title">Selamat Datang di {{ $siteSettings->site_name ?? 'Web Demo Pendidikan' }}</h1>
                     <p class="hero-description">{{ $siteSettings->site_description ?? 'Membangun generasi yang berakhlak mulia dan berprestasi dengan pendidikan Islam yang terintegrasi.' }}</p>
                     <div class="hero-buttons">
                         <a href="#programs" class="btn btn-modern-primary">

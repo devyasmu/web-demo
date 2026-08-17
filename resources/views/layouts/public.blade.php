@@ -897,8 +897,8 @@
         <div class="container">
             <div class="row">
                 <div class="col-lg-4 mb-4">
-                    <h5 class="mb-3">{{ $siteSettings->site_name ?? 'Yayasan Pendidikan Islam' }}</h5>
-                    <p class="mb-3">{{ $siteSettings->site_description ?? 'Yayasan Pendidikan Islam yang berkomitmen untuk memberikan pendidikan berkualitas dengan nilai-nilai Islam yang kuat.' }}</p>
+                    <h5 class="mb-3">{{ $siteSettings->site_name ?? 'Web Demo Pendidikan' }}</h5>
+                    <p class="mb-3">{{ $siteSettings->site_description ?? 'Website demo pendidikan yang siap disesuaikan untuk profil lembaga, berita, galeri, dan layanan informasi.' }}</p>
                     @if(isset($siteSettings))
                         <div class="social-links">
                             @if($siteSettings->facebook)
@@ -951,7 +951,7 @@
             
             <div class="row align-items-center">
                 <div class="col-md-6">
-                    <p class="mb-0">&copy; {{ date('Y') }} {{ $siteSettings->site_name ?? 'Yayasan Pendidikan Islam' }}. All rights reserved.</p>
+                    <p class="mb-0">&copy; {{ date('Y') }} {{ $siteSettings->site_name ?? 'Web Demo Pendidikan' }}. All rights reserved.</p>
                 </div>
                 <div class="col-md-6 text-md-end">
                     <p class="mb-0">Made with <i class="bi bi-heart-fill text-danger"></i> for Education</p>

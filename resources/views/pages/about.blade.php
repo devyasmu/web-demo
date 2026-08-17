@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'Tentang Kami - ' . ($siteSettings->site_name ?? config('app.name')))
-@section('description', 'Tentang Yayasan Ma\'arif NU Hidyatus Salam - Membangun Generasi Berkarakter dan Berprestasi')
+@section('description', 'Tentang Web Demo Pendidikan - Membangun profil lembaga pendidikan yang informatif')
 
 @section('content')
 <div class="container py-5">
@@ -9,7 +9,7 @@
         <div class="col-lg-8 mx-auto">
             <div class="text-center mb-5">
                 <h1 class="display-4 fw-bold text-primary">Tentang Kami</h1>
-                <p class="lead text-muted">Yayasan Ma'arif NU Hidyatus Salam</p>
+                <p class="lead text-muted">Web Demo Pendidikan</p>
             </div>
 
             <div class="card shadow-lg border-0">
@@ -21,15 +21,15 @@
                             @endif
                         </div>
                         <div class="col-md-8">
-                            <h2 class="h3 mb-3">{{ $siteSettings->site_name ?? 'Yayasan Mu\'allimin Mu\'allimat' }}</h2>
-                            <p class="lead">{{ $siteSettings->site_tagline ?? 'Membangun Generasi Berkarakter dan Berprestasi' }}</p>
+                            <h2 class="h3 mb-3">{{ $siteSettings->site_name ?? 'Web Demo Pendidikan' }}</h2>
+                            <p class="lead">{{ $siteSettings->site_tagline ?? 'Template website sekolah dan yayasan siap pakai' }}</p>
                         </div>
                     </div>
 
                     <div class="mt-4">
                         <h3 class="h4 mb-3">Sejarah Singkat</h3>
                         <p class="text-justify">
-                            {{ $siteSettings->site_description ?? 'Yayasan Mu\'allimin Mu\'allimat didirikan dengan komitmen untuk memberikan pendidikan berkualitas dengan nilai-nilai Islam yang kuat. Kami berdedikasi untuk membangun generasi yang berkarakter, berprestasi, dan memiliki akhlak mulia.' }}
+                            {{ $siteSettings->site_description ?? 'Web Demo Pendidikan adalah data contoh untuk menampilkan profil lembaga, program, berita, galeri, download, dan kontak dalam satu website.' }}
                         </p>
                     </div>
 
@@ -55,12 +55,12 @@
                         <h3 class="h4 mb-3">Kontak Kami</h3>
                         <div class="row">
                             <div class="col-md-6">
-                                <p><i class="bi bi-geo-alt text-primary me-2"></i> {{ $siteSettings->address ?? 'Jl. Pendidikan No. 123, Jakarta Selatan 12345' }}</p>
-                                <p><i class="bi bi-telephone text-primary me-2"></i> {{ $siteSettings->phone ?? '+62 21 1234 5678' }}</p>
+                                <p><i class="bi bi-geo-alt text-primary me-2"></i> {{ $siteSettings->address ?? 'Jl. Demo Pendidikan No. 1, Kota Demo' }}</p>
+                                <p><i class="bi bi-telephone text-primary me-2"></i> {{ $siteSettings->phone ?? '081234567890' }}</p>
                             </div>
                             <div class="col-md-6">
-                                <p><i class="bi bi-envelope text-primary me-2"></i> {{ $siteSettings->email ?? 'info@yayasanpendidikan.com' }}</p>
-                                <p><i class="bi bi-globe text-primary me-2"></i> {{ $siteSettings->site_name ?? 'yasmumanyar.or.id' }}</p>
+                                <p><i class="bi bi-envelope text-primary me-2"></i> {{ $siteSettings->email ?? 'admin@webdemo.test' }}</p>
+                                <p><i class="bi bi-globe text-primary me-2"></i> {{ $siteSettings->site_name ?? 'webdemo.or.id' }}</p>
                             </div>
                         </div>
                     </div>

@@ -33,7 +33,7 @@
             <label for="phone" class="form-label">Nomor WhatsApp</label>
             <input type="text" class="form-control @error('phone') is-invalid @enderror"
                    id="phone" name="phone" value="{{ old('phone', $institutionContact->phone ?? '') }}"
-                   placeholder="Contoh: 085785377790">
+                   placeholder="Contoh: 081234567890">
             <small class="form-text text-muted">Boleh 08xx atau +62. Jika kosong, tombol mengarah ke halaman kontak.</small>
             @error('phone')
                 <div class="invalid-feedback">{{ $message }}</div>

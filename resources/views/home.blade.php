@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
-@section('title', $siteSettings->site_name ?? 'Yayasan Pendidikan Islam')
-@section('description', $siteSettings->site_description ?? 'Yayasan Pendidikan Islam yang berkomitmen untuk memberikan pendidikan berkualitas dengan nilai-nilai Islam yang kuat.')
+@section('title', $siteSettings->site_name ?? 'Web Demo Pendidikan')
+@section('description', $siteSettings->site_description ?? 'Website demo pendidikan yang siap disesuaikan untuk profil lembaga, berita, galeri, dan layanan informasi.')
 
 @section('content')
 @php
@@ -14,8 +14,8 @@
     $quickLinkList = collect($quickLinks ?? []);
     $institutionContactList = collect($institutionContacts ?? []);
 
-    $siteName = $siteSettings->site_name ?? 'YASMU Manyar';
-    $siteDescription = $siteSettings->site_description ?? 'Yayasan pendidikan Islam di Manyar Gresik yang membina generasi beradab, berilmu, dan siap tumbuh.';
+    $siteName = $siteSettings->site_name ?? 'Web Demo Pendidikan';
+    $siteDescription = $siteSettings->site_description ?? 'Website demo pendidikan yang siap disesuaikan untuk profil lembaga, berita, galeri, dan layanan informasi.';
     $siteTagline = $siteSettings->site_tagline ?? null;
     $sliderList = collect($sliders ?? [])->take(4)->values();
     $defaultHeroHeadline = $siteTagline ?: 'Generasi beradab, siap tumbuh.';
@@ -80,7 +80,7 @@
             (object) ['name' => 'SMK', 'contact_person' => null, 'phone' => $siteSettings->phone ?? null, 'description' => 'Informasi jenjang sekolah menengah kejuruan', 'icon' => 'bi bi-whatsapp'],
         ]);
 
-    $whatsappUrl = \App\Helpers\ContactHelper::whatsappUrl($siteSettings->phone ?? null, 'Halo, saya ingin bertanya tentang program pendidikan YASMU Manyar.');
+    $whatsappUrl = \App\Helpers\ContactHelper::whatsappUrl($siteSettings->phone ?? null, 'Halo, saya ingin bertanya tentang layanan Web Demo Pendidikan.');
     $programCount = $programList->count();
     $postCount = $postList->count();
     $testimonialCount = $testimonialList->count();
@@ -103,7 +103,7 @@
     <div class="home-wrap">
         <div class="home-hero-grid">
             <div class="home-hero-copy">
-                <div class="home-kicker"><i class="bi bi-stars"></i> Pendidikan Islam Manyar Gresik</div>
+                <div class="home-kicker"><i class="bi bi-stars"></i> Demo Website Pendidikan</div>
                 <h1 data-hero-headline>{{ $heroHeadline }}</h1>
                 <p data-hero-description>{{ $heroDescription }}</p>
                 <div class="home-actions">
@@ -120,7 +120,7 @@
             <aside class="home-live-card">
                 <div class="home-live-head">
                     <div>
-                        <span>YASMU Pulse</span>
+                        <span>Demo Pulse</span>
                         <strong>Aktif hari ini</strong>
                     </div>
                     <span class="home-live-dot"></span>
@@ -224,7 +224,7 @@
     <div class="home-wrap">
         <div class="home-section-head">
             <div>
-                <div class="home-section-label">Kabar YASMU</div>
+                <div class="home-section-label">Kabar Demo</div>
                 <h2>Aktivitas terbaru tampil sebagai cerita.</h2>
             </div>
             <a class="home-btn home-btn-glass" href="{{ route('posts.index') }}">Semua Berita</a>
@@ -272,7 +272,7 @@
     <div class="home-wrap home-voices-grid">
         <div>
             <div class="home-section-label">Testimoni</div>
-            <h2>Kesan dari keluarga besar YASMU.</h2>
+            <h2>Kesan dari pengguna demo.</h2>
         </div>
         <div class="home-voice-list">
             @foreach($testimonialList->take(2) as $testimonial)
@@ -312,7 +312,7 @@
                 <div class="home-wa-options">
                     @foreach($institutionContactsResolved as $contact)
                         @php
-                            $contactMessage = 'Halo, saya ingin menghubungi ' . $contact->name . ' YASMU Manyar.';
+                            $contactMessage = 'Halo, saya ingin menghubungi ' . $contact->name . ' Web Demo Pendidikan.';
                             $contactUrl = \App\Helpers\ContactHelper::whatsappUrl($contact->phone ?? null, $contactMessage);
                             $contactDescription = $contact->contact_person
                                 ? $contact->contact_person . ' - ' . ($contact->description ?: 'Informasi lembaga')

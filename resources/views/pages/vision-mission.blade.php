@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'Visi dan Misi - ' . ($siteSettings->site_name ?? config('app.name')))
-@section('description', 'Visi dan Misi Yayasan Mu\'allimin Mu\'allimat - Membangun Generasi Berkarakter dan Berprestasi')
+@section('description', 'Visi dan Misi Web Demo Pendidikan')
 
 @section('content')
 <div class="container py-5">
@@ -9,7 +9,7 @@
         <div class="col-lg-10 mx-auto">
             <div class="text-center mb-5">
                 <h1 class="display-4 fw-bold text-primary">Visi dan Misi</h1>
-                <p class="lead text-muted">Yayasan Mu'allimin Mu'allimat</p>
+                <p class="lead text-muted">Web Demo Pendidikan</p>
             </div>
 
             <div class="row">

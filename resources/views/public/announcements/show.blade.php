@@ -162,7 +162,7 @@
                     <div class="mb-3">
                         <i class="bi bi-envelope me-2"></i>
                         <strong>Email:</strong><br>
-                        <small>{{ $siteSettings->email ?? 'info@yayasan.com' }}</small>
+                        <small>{{ $siteSettings->email ?? 'admin@webdemo.test' }}</small>
                     </div>
                     <a href="{{ route('contacts.index') }}" 
                        class="btn w-100" 
