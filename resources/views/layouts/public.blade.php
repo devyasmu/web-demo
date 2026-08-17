@@ -65,16 +65,27 @@
             line-height: 1.6;
             background-color: var(--body-bg-color) !important;
             color: var(--body-text-color) !important;
+            overflow-x: hidden;
+        }
+
+        .site-main {
+            padding-bottom: 0;
         }
         
         .navbar {
             background-color: rgba(var(--header-bg-color-rgb, 255, 255, 255), var(--navbar-transparency, 100) / 100) !important;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            padding: 1rem 0;
+            padding: 0.75rem 0;
             transition: all 0.3s ease;
             position: sticky;
             top: 0;
             z-index: 1030;
+        }
+
+        .navbar .container {
+            max-width: min(100% - 32px, 1760px);
+            padding-left: 0;
+            padding-right: 0;
         }
         
         .navbar.scrolled {
@@ -147,16 +158,50 @@
         }
         
         .navbar-brand {
+            display: flex;
+            align-items: center;
+            min-width: 0;
             font-weight: 700;
-            font-size: 1.5rem;
+            font-size: clamp(1.05rem, 1.55vw, 1.5rem);
             color: var(--header-text-color) !important;
+            line-height: 1.15;
+            margin-right: clamp(0.75rem, 1.5vw, 1.5rem);
+            max-width: min(34vw, 430px);
+            white-space: normal;
+        }
+
+        .navbar-brand img {
+            flex: 0 0 auto;
+            max-width: 42px;
+            object-fit: contain;
+        }
+
+        .navbar-collapse {
+            min-width: 0;
+        }
+
+        .navbar-collapse > .navbar-nav:first-child {
+            flex: 1 1 auto;
+            flex-wrap: wrap;
+            justify-content: center;
+            min-width: 0;
+            row-gap: 0.15rem;
+        }
+
+        .navbar-collapse > .navbar-nav:last-child {
+            flex: 0 1 auto;
+            min-width: 0;
         }
         
         .navbar-nav .nav-link {
             color: var(--header-text-color) !important;
             font-weight: 500;
-            margin: 0 0.5rem;
+            margin: 0 0.35rem;
+            padding-left: 0.35rem;
+            padding-right: 0.35rem;
             transition: all 0.3s ease;
+            white-space: normal;
+            text-align: center;
         }
         
         .navbar-nav .nav-link:hover {
@@ -361,16 +406,21 @@
             display: flex !important;
             flex-direction: column !important;
             align-items: flex-end !important;
-            font-size: 0.85rem !important;
+            font-size: 0.78rem !important;
             line-height: 1.2 !important;
-            min-width: 200px !important;
+            min-width: 150px !important;
+            max-width: 190px;
+            overflow: hidden;
         }
         
         .datetime-main, .datetime-time, .datetime-hijri {
             display: flex;
             align-items: center;
             margin-bottom: 2px;
+            max-width: 100%;
             white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         
         .datetime-main {
@@ -398,6 +448,18 @@
         
         /* Mobile responsive */
         @media (max-width: 991.98px) {
+            .site-main {
+                padding-bottom: 72px;
+            }
+
+            .navbar .container {
+                max-width: min(100% - 24px, 1760px);
+            }
+
+            .navbar-brand {
+                max-width: min(58vw, 420px);
+            }
+
             .datetime-display {
                 flex-direction: row;
                 flex-wrap: wrap;
@@ -419,12 +481,23 @@
         }
         
         @media (max-width: 576px) {
+            .navbar-brand {
+                max-width: 50vw;
+                font-size: 0.98rem;
+            }
+
             .datetime-display {
                 font-size: 0.75rem;
             }
             
             .datetime-main, .datetime-time, .datetime-hijri {
                 margin-right: 0.5rem;
+            }
+        }
+
+        @media (max-width: 1399.98px) {
+            .desktop-datetime-nav {
+                display: none !important;
             }
         }
         
@@ -525,7 +598,7 @@
         <div class="container">
             <a class="navbar-brand" href="{{ route('home') }}" style="color: var(--header-text-color);">
                 @if(isset($siteSettings) && $siteSettings->logo)
-                    <img src="{{ asset('storage/' . $siteSettings->logo) }}" alt="{{ $siteSettings->site_name }}" height="40" class="me-2">
+                    <img src="{{ asset('storage/' . $siteSettings->logo) }}" alt="" height="40" class="me-2" onerror="this.remove()">
                 @endif
                 {{ $siteSettings->site_name ?? config('app.name', 'Laravel') }}
             </a>
@@ -586,7 +659,7 @@
                 
                 <ul class="navbar-nav">
                     <!-- Date and Time Display -->
-                    <li class="nav-item d-none d-lg-block">
+                    <li class="nav-item d-none d-lg-block desktop-datetime-nav">
                         <div class="datetime-display" style="color: var(--header-text-color);">
                             <div class="datetime-main">
                                 <i class="bi bi-calendar3 me-1"></i>
@@ -608,7 +681,7 @@
     </nav>
 
     <!-- Main Content -->
-    <main style="padding-bottom: 72px;"> <!-- space for bottom mobile nav -->
+    <main class="site-main">
         @yield('content')
     </main>
 

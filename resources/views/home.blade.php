@@ -338,7 +338,7 @@
         <div class="home-footer-bottom">
             <div class="home-footer-brand">
                 @if(isset($siteSettings) && $siteSettings->logo)
-                    <img src="{{ asset('storage/' . $siteSettings->logo) }}" alt="{{ $siteName }}">
+                    <img src="{{ asset('storage/' . $siteSettings->logo) }}" alt="" onerror="this.remove()">
                 @endif
                 <div>
                     <h4>{{ $siteName }}</h4>
