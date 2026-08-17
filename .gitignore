@@ -41,3 +41,12 @@ debug_storage.php
 # Backup/database archives
 *.sql
 *.zip
+
+.env
+vendor/
+node_modules/
+storage/logs/
+storage/framework/cache/
+storage/framework/sessions/
+storage/framework/views/
+public/storage
