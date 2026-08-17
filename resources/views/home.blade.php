@@ -755,10 +755,16 @@ body {
     text-decoration: none;
 }
 
-.home-program-card img,
-.home-news-grid img {
+.home-program-card img {
     width: 100%;
     height: 100%;
+    object-fit: cover;
+    opacity: 0.82;
+}
+
+.home-news-grid img {
+    width: 100%;
+    height: auto;
     object-fit: cover;
     opacity: 0.82;
 }
