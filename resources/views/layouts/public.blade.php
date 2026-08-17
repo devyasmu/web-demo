@@ -176,6 +176,14 @@
             object-fit: contain;
         }
 
+        .navbar-brand-text {
+            min-width: 0;
+        }
+
+        .mobile-datetime {
+            display: none;
+        }
+
         .navbar-collapse {
             min-width: 0;
         }
@@ -452,12 +460,73 @@
                 padding-bottom: 72px;
             }
 
+            .navbar {
+                padding: 0.58rem 0;
+            }
+
             .navbar .container {
+                align-items: center;
+                display: flex;
+                flex-wrap: nowrap;
+                gap: 10px;
                 max-width: min(100% - 24px, 1760px);
             }
 
             .navbar-brand {
-                max-width: min(58vw, 420px);
+                flex: 1 1 auto;
+                font-size: clamp(0.92rem, 4.35vw, 1.18rem);
+                line-height: 1.08;
+                margin-right: 0;
+                max-width: none;
+                min-width: 0;
+            }
+
+            .navbar-brand img {
+                height: 38px;
+                max-width: 38px;
+            }
+
+            .navbar-brand-text {
+                display: block;
+                overflow-wrap: anywhere;
+            }
+
+            .mobile-datetime {
+                align-items: flex-end;
+                color: var(--header-text-color);
+                display: flex;
+                flex: 0 0 auto;
+                flex-direction: column;
+                gap: 2px;
+                line-height: 1.1;
+                max-width: 122px;
+                text-align: right;
+            }
+
+            .mobile-datetime span {
+                align-items: center;
+                display: flex;
+                justify-content: flex-end;
+                max-width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .mobile-datetime i {
+                flex: 0 0 auto;
+                font-size: 0.78rem;
+                margin-right: 4px;
+            }
+
+            .mobile-datetime-date {
+                font-size: 0.74rem;
+                font-weight: 700;
+            }
+
+            .mobile-datetime-time {
+                font-size: 0.8rem;
+                font-weight: 800;
             }
 
             .datetime-display {
@@ -479,11 +548,89 @@
                 margin-top: 0.25rem;
             }
         }
+
+        @media (min-width: 992px) and (max-width: 1399.98px) {
+            .navbar .container {
+                align-items: center;
+                display: flex;
+                flex-wrap: nowrap;
+                gap: 18px;
+                max-width: min(100% - 40px, 1760px);
+            }
+
+            .navbar-brand {
+                flex: 0 1 340px;
+                margin-right: 0;
+                max-width: 340px;
+            }
+
+            .navbar-collapse {
+                flex: 1 1 auto;
+                min-width: 0;
+                order: 2;
+            }
+
+            .mobile-datetime {
+                align-items: flex-end;
+                color: var(--header-text-color);
+                display: flex;
+                flex: 0 0 auto;
+                flex-direction: column;
+                gap: 2px;
+                line-height: 1.1;
+                margin-left: auto;
+                max-width: 132px;
+                order: 3;
+                text-align: right;
+            }
+
+            .mobile-datetime span {
+                align-items: center;
+                display: flex;
+                justify-content: flex-end;
+                max-width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .mobile-datetime i {
+                flex: 0 0 auto;
+                font-size: 0.78rem;
+                margin-right: 4px;
+            }
+
+            .mobile-datetime-date {
+                font-size: 0.74rem;
+                font-weight: 700;
+            }
+
+            .mobile-datetime-time {
+                font-size: 0.8rem;
+                font-weight: 800;
+            }
+        }
         
         @media (max-width: 576px) {
             .navbar-brand {
-                max-width: 50vw;
-                font-size: 0.98rem;
+                font-size: clamp(0.9rem, 4.4vw, 1.08rem);
+            }
+
+            .navbar-brand img {
+                height: 34px;
+                max-width: 34px;
+            }
+
+            .mobile-datetime {
+                max-width: 108px;
+            }
+
+            .mobile-datetime-date {
+                font-size: 0.68rem;
+            }
+
+            .mobile-datetime-time {
+                font-size: 0.74rem;
             }
 
             .datetime-display {
@@ -600,15 +747,18 @@
                 @if(isset($siteSettings) && $siteSettings->logo)
                     <img src="{{ asset('storage/' . $siteSettings->logo) }}" alt="" height="40" class="me-2" onerror="this.remove()">
                 @endif
-                {{ $siteSettings->site_name ?? config('app.name', 'Laravel') }}
+                <span class="navbar-brand-text">{{ $siteSettings->site_name ?? config('app.name', 'Laravel') }}</span>
             </a>
             
-            <!-- Replace hamburger with compact date/time on small screens -->
-            <div class="d-md-none d-block ms-auto" style="color: var(--header-text-color);">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="d-flex align-items-center"><i class="bi bi-calendar3 me-1"></i><span id="current-date"></span></div>
-                    <div class="d-flex align-items-center"><i class="bi bi-clock me-1"></i><span id="current-time"></span></div>
-                </div>
+            <div class="mobile-datetime" aria-label="Tanggal dan waktu">
+                <span class="mobile-datetime-date">
+                    <i class="bi bi-calendar3"></i>
+                    <span id="current-date">{{ \Carbon\Carbon::now('Asia/Jakarta')->translatedFormat('D d M') }}</span>
+                </span>
+                <span class="mobile-datetime-time">
+                    <i class="bi bi-clock"></i>
+                    <span id="current-time">{{ \Carbon\Carbon::now('Asia/Jakarta')->format('H:i') }}</span>
+                </span>
             </div>
             
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -967,7 +1117,7 @@
                     day: 'numeric',
                     weekday: 'long'
                 };
-                
+
                 // Format untuk waktu
                 const timeOptions = {
                     timeZone: 'Asia/Jakarta',
@@ -976,20 +1126,28 @@
                     second: '2-digit',
                     hour12: false
                 };
+
+                const mobileTimeOptions = {
+                    timeZone: 'Asia/Jakarta',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                };
                 
                 const dateFormatter = new Intl.DateTimeFormat('id-ID', dateOptions);
                 const timeFormatter = new Intl.DateTimeFormat('id-ID', timeOptions);
+                const mobileTimeFormatter = new Intl.DateTimeFormat('id-ID', mobileTimeOptions);
                 
                 // Update tanggal dan waktu untuk mobile
                 const currentDateElement = document.getElementById('current-date');
                 const currentTimeElement = document.getElementById('current-time');
                 
                 if (currentDateElement) {
-                    currentDateElement.textContent = dateFormatter.format(now);
+                    currentDateElement.textContent = formatMobileDate(now);
                 }
                 
                 if (currentTimeElement) {
-                    currentTimeElement.textContent = timeFormatter.format(now);
+                    currentTimeElement.textContent = mobileTimeFormatter.format(now);
                 }
                 
                 // Update tanggal dan waktu untuk desktop
@@ -1013,6 +1171,23 @@
                     const hijriDateElement = document.getElementById('hijri-date');
                     if (hijriDateElement) hijriDateElement.textContent = lastHijriText;
                 }
+            }
+
+            function formatMobileDate(date) {
+                const weekday = new Intl.DateTimeFormat('id-ID', {
+                    timeZone: 'Asia/Jakarta',
+                    weekday: 'short'
+                }).format(date).replace(/[.,]/g, '');
+                const day = new Intl.DateTimeFormat('id-ID', {
+                    timeZone: 'Asia/Jakarta',
+                    day: '2-digit'
+                }).format(date);
+                const month = new Intl.DateTimeFormat('id-ID', {
+                    timeZone: 'Asia/Jakarta',
+                    month: 'short'
+                }).format(date).replace(/[.,]/g, '');
+
+                return `${weekday} ${day} ${month}`;
             }
             
             function updateHijriDate(gregorianDate) {
