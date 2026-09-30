@@ -84,7 +84,7 @@
                         </h5>
                         
                         @if($program->description)
-                            <p class="card-text text-muted flex-grow-1">
+                            <p class="card-text text-muted flex-grow-1 public-readable-text">
                                 {{ Str::limit($program->description, 120) }}
                             </p>
                         @endif

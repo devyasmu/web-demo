@@ -51,7 +51,7 @@
                     @if($program->description)
                         <div class="mb-4">
                             <h5 style="color: var(--primary-color);">Deskripsi Program</h5>
-                            <p class="lead">{{ $program->description }}</p>
+                            <p class="lead public-readable-text">{{ $program->description }}</p>
                         </div>
                     @endif
 
@@ -64,7 +64,7 @@
 
                     <!-- Program Features -->
                     @if($program->features)
-                        <div class="mt-4">
+                        <div class="mt-4 public-readable-text">
                             <h5 style="color: var(--primary-color);">Fitur Program</h5>
                             <ul class="list-unstyled">
                                 @foreach(explode("\n", $program->features) as $feature)
@@ -81,7 +81,7 @@
 
                     <!-- Program Requirements -->
                     @if($program->requirements)
-                        <div class="mt-4">
+                        <div class="mt-4 public-readable-text">
                             <h5 style="color: var(--primary-color);">Persyaratan</h5>
                             <ul class="list-unstyled">
                                 @foreach(explode("\n", $program->requirements) as $requirement)

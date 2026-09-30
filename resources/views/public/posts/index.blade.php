@@ -90,14 +90,14 @@
                             </a>
                         </h5>
                         
-                        <p class="card-text text-muted flex-grow-1">
+                        <p class="card-text text-muted flex-grow-1 public-readable-text">
                             {{ Str::limit(strip_tags($post->content), 120) }}
                         </p>
                         
                         <div class="d-flex justify-content-between align-items-center mt-auto">
                             <small class="text-muted">
                                 <i class="bi bi-calendar3 me-1"></i>
-                                {{ $post->published_at->format('d M Y') }}
+                                {{ optional($post->published_at ?? $post->created_at)->format('d M Y') }}
                             </small>
                             <a href="{{ route('posts.show', $post->slug) }}" 
                                class="btn btn-sm" 

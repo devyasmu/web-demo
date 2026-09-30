@@ -725,6 +725,100 @@
             scrollbar-width: none;
         }
 
+        /* Long-form readable content */
+        .post-content,
+        .announcement-content,
+        .program-content,
+        .page-content,
+        .gallery-content,
+        .faq-answer,
+        .testimonial-content,
+        .public-readable-text {
+            text-align: justify;
+            text-align-last: left;
+            hyphens: auto;
+            overflow-wrap: break-word;
+            word-break: normal;
+        }
+
+        .post-content p,
+        .post-content div,
+        .post-content span,
+        .post-content li,
+        .announcement-content p,
+        .announcement-content div,
+        .announcement-content span,
+        .announcement-content li,
+        .program-content p,
+        .program-content div,
+        .program-content span,
+        .program-content li,
+        .page-content p,
+        .page-content div,
+        .page-content span,
+        .page-content li,
+        .gallery-content p,
+        .gallery-content div,
+        .gallery-content span,
+        .gallery-content li,
+        .faq-answer p,
+        .faq-answer div,
+        .faq-answer span,
+        .faq-answer li,
+        .testimonial-content,
+        .public-readable-text p,
+        .public-readable-text div,
+        .public-readable-text span,
+        .public-readable-text li {
+            text-align: justify !important;
+            text-align-last: left;
+        }
+
+        .post-content h1,
+        .post-content h2,
+        .post-content h3,
+        .post-content h4,
+        .post-content h5,
+        .post-content h6,
+        .announcement-content h1,
+        .announcement-content h2,
+        .announcement-content h3,
+        .announcement-content h4,
+        .announcement-content h5,
+        .announcement-content h6,
+        .program-content h1,
+        .program-content h2,
+        .program-content h3,
+        .program-content h4,
+        .program-content h5,
+        .program-content h6,
+        .page-content h1,
+        .page-content h2,
+        .page-content h3,
+        .page-content h4,
+        .page-content h5,
+        .page-content h6,
+        .gallery-content h1,
+        .gallery-content h2,
+        .gallery-content h3,
+        .gallery-content h4,
+        .gallery-content h5,
+        .gallery-content h6,
+        .faq-answer h1,
+        .faq-answer h2,
+        .faq-answer h3,
+        .faq-answer h4,
+        .faq-answer h5,
+        .faq-answer h6,
+        .public-readable-text h1,
+        .public-readable-text h2,
+        .public-readable-text h3,
+        .public-readable-text h4,
+        .public-readable-text h5,
+        .public-readable-text h6 {
+            text-align: left !important;
+        }
+
         @media (max-width: 991.98px) {
             .bottom-mobile-wrapper {
                 display: block;

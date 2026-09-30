@@ -72,7 +72,7 @@
                                 </h5>
                                 
                                 @if($download->description)
-                                    <p class="card-text text-muted mb-3">
+                                    <p class="card-text text-muted mb-3 public-readable-text">
                                         {{ Str::limit($download->description, 100) }}
                                     </p>
                                 @endif

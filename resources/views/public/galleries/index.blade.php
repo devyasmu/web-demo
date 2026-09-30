@@ -80,7 +80,7 @@
                         </h5>
                         
                         @if($gallery->description)
-                            <p class="card-text text-muted flex-grow-1">
+                            <p class="card-text text-muted flex-grow-1 public-readable-text">
                                 {{ Str::limit($gallery->description, 120) }}
                             </p>
                         @endif

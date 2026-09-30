@@ -34,16 +34,32 @@ class DownloadController extends Controller
     public function download($id)
     {
         $download = Download::active()->findOrFail($id);
-        
-        // Increment download count
-        $download->increment('download_count');
-        
-        $filePath = storage_path('app/public/' . $download->file_path);
-        
-        if (!file_exists($filePath)) {
+
+        $filePath = $this->resolveDownloadPath($download->file_path);
+
+        if (!$filePath) {
             abort(404, 'File not found');
         }
-        
+
+        // Increment only after the file is confirmed to exist.
+        $download->increment('download_count');
+
         return response()->download($filePath, $download->file_name);
+    }
+
+    private function resolveDownloadPath(string $path): ?string
+    {
+        $candidates = [
+            storage_path('app/public/' . $path),
+            public_path('storage/' . $path),
+        ];
+
+        foreach ($candidates as $candidate) {
+            if (is_file($candidate)) {
+                return $candidate;
+            }
+        }
+
+        return null;
     }
 }

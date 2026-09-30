@@ -102,7 +102,7 @@
 
                         <!-- Testimonial Content -->
                         <div class="flex-grow-1">
-                            <blockquote class="mb-3" style="font-style: italic; color: var(--section-text-color);">
+                            <blockquote class="mb-3 testimonial-content" style="font-style: italic; color: var(--section-text-color);">
                                 "{{ $testimonial->content }}"
                             </blockquote>
                         </div>

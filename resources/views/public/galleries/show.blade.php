@@ -47,11 +47,11 @@
                     </div>
 
                     @if($gallery->description)
-                        <p class="lead text-muted mb-4">{{ $gallery->description }}</p>
+                        <p class="lead text-muted mb-4 public-readable-text">{{ $gallery->description }}</p>
                     @endif
 
                     @if($gallery->content)
-                        <div class="mt-3">
+                        <div class="mt-3 gallery-content">
                             {!! $gallery->content !!}
                         </div>
                     @endif

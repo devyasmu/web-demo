@@ -91,7 +91,7 @@
                                         </h4>
                                         
                                         @if($announcement->excerpt)
-                                            <p class="card-text text-muted mb-3">
+                                            <p class="card-text text-muted mb-3 public-readable-text">
                                                 {{ $announcement->excerpt }}
                                             </p>
                                         @endif

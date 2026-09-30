@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
@@ -45,8 +46,10 @@ class PostController extends Controller
 
         $data = $request->all();
         $data['user_id'] = auth()->id();
+        $data['slug'] = $this->uniqueSlug($request->title);
         $data['is_published'] = $request->has('is_published');
         $data['is_featured'] = $request->has('is_featured');
+        $data['published_at'] = $this->publishedAt($request);
 
         if ($request->hasFile('featured_image')) {
             $data['featured_image'] = $request->file('featured_image')->store('posts', 'public');
@@ -94,8 +97,10 @@ class PostController extends Controller
         ]);
 
         $data = $request->all();
+        $data['slug'] = $this->uniqueSlug($request->title, $post->id);
         $data['is_published'] = $request->has('is_published');
         $data['is_featured'] = $request->has('is_featured');
+        $data['published_at'] = $this->publishedAt($request, $post->published_at);
 
         if ($request->hasFile('featured_image')) {
             $data['featured_image'] = $request->file('featured_image')->store('posts', 'public');
@@ -116,5 +121,34 @@ class PostController extends Controller
 
         return redirect()->route('admin.admin-posts.index')
             ->with('success', 'Post berhasil dihapus.');
+    }
+
+    private function uniqueSlug(string $title, ?int $ignoreId = null): string
+    {
+        $baseSlug = Str::slug($title);
+        $slug = $baseSlug;
+        $counter = 2;
+
+        while (\App\Models\Post::where('slug', $slug)
+            ->when($ignoreId, fn ($query) => $query->where('id', '!=', $ignoreId))
+            ->exists()) {
+            $slug = "{$baseSlug}-{$counter}";
+            $counter++;
+        }
+
+        return $slug;
+    }
+
+    private function publishedAt(Request $request, $current = null)
+    {
+        if ($request->filled('published_at')) {
+            return $request->published_at;
+        }
+
+        if ($request->has('is_published')) {
+            return $current ?: now();
+        }
+
+        return null;
     }
 }
