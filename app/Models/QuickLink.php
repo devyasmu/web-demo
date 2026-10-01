@@ -31,4 +31,38 @@ class QuickLink extends Model
     {
         return $query->orderBy('order');
     }
+
+    public function getResolvedUrlAttribute(): string
+    {
+        return self::normalizeUrl($this->url);
+    }
+
+    public function getIsExternalAttribute(): bool
+    {
+        return self::isExternalUrl($this->resolved_url);
+    }
+
+    public static function normalizeUrl(?string $url): string
+    {
+        $url = trim((string) $url);
+
+        if ($url === '') {
+            return '#';
+        }
+
+        if (str_starts_with($url, '/') || str_starts_with($url, '#')) {
+            return $url;
+        }
+
+        if (preg_match('/^[a-z][a-z0-9+.-]*:/i', $url)) {
+            return $url;
+        }
+
+        return 'https://' . $url;
+    }
+
+    public static function isExternalUrl(string $url): bool
+    {
+        return (bool) preg_match('/^https?:\/\//i', $url);
+    }
 }

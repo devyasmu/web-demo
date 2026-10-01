@@ -41,6 +41,7 @@ class QuickLinkController extends Controller
         ]);
 
         $data = $request->except('image');
+        $data['url'] = QuickLink::normalizeUrl($request->url);
         $data['is_active'] = $request->has('is_active');
         $data['icon'] = $request->icon ?: 'bi bi-link-45deg';
 
@@ -78,6 +79,7 @@ class QuickLinkController extends Controller
         ]);
 
         $data = $request->except('image', 'remove_image');
+        $data['url'] = QuickLink::normalizeUrl($request->url);
         $data['is_active'] = $request->has('is_active');
         $data['icon'] = $request->icon ?: 'bi bi-link-45deg';
 

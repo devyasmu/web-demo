@@ -62,7 +62,7 @@ class ProgramController extends Controller
     public function destroy(\App\Models\Program $program)
     {
         $program->delete();
-        return redirect()->route('admin.programs.index')
+        return redirect()->route('admin.admin-programs.index')
             ->with('success', 'Program berhasil dihapus.');
     }
 }

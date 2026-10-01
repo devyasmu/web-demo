@@ -43,7 +43,7 @@
                                id="url" name="url" value="{{ old('url') }}" 
                                placeholder="https://example.com atau /kontak" required>
                         <small class="form-text text-muted">
-                            Link akan terbuka di tab baru. Bisa URL eksternal (https://) atau internal (/programs).
+                            Bisa URL eksternal (contoh: bit.ly/SPMBMALKA2026 atau https://example.com) atau internal (/programs).
                         </small>
                         @error('url')
                             <div class="invalid-feedback">{{ $message }}</div>

@@ -53,7 +53,7 @@
                                     </td>
                                     <td>{{ $link->title }}</td>
                                     <td>
-                                        <a href="{{ $link->url }}" target="_blank" rel="noopener" class="text-truncate d-inline-block" style="max-width: 200px;">
+                                        <a href="{{ $link->resolved_url }}" target="_blank" rel="noopener" class="text-truncate d-inline-block" style="max-width: 200px;">
                                             {{ Str::limit($link->url, 40) }}
                                         </a>
                                     </td>

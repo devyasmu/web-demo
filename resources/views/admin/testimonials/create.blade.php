@@ -24,10 +24,10 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="title" class="form-label">Jabatan/Profesi</label>
-                        <input type="text" class="form-control @error('title') is-invalid @enderror" 
-                               id="title" name="title" value="{{ old('title') }}" placeholder="Contoh: CEO, Mahasiswa, Alumni">
-                        @error('title')
+                        <label for="position" class="form-label">Jabatan/Profesi</label>
+                        <input type="text" class="form-control @error('position') is-invalid @enderror" 
+                               id="position" name="position" value="{{ old('position') }}" placeholder="Contoh: Alumni, Wali Siswa, Guru">
+                        @error('position')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
@@ -42,38 +42,20 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control @error('email') is-invalid @enderror" 
-                               id="email" name="email" value="{{ old('email') }}">
-                        @error('email')
+                        <label for="testimonial" class="form-label">Testimoni <span class="text-danger">*</span></label>
+                        <textarea class="form-control @error('testimonial') is-invalid @enderror" 
+                                  id="testimonial" name="testimonial" rows="15">{{ old('testimonial') }}</textarea>
+                        @error('testimonial')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="mb-3">
-                        <label for="phone" class="form-label">Telepon</label>
-                        <input type="text" class="form-control @error('phone') is-invalid @enderror" 
-                               id="phone" name="phone" value="{{ old('phone') }}" placeholder="Contoh: +62 812-3456-7890">
-                        @error('phone')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="content" class="form-label">Testimoni <span class="text-danger">*</span></label>
-                        <textarea class="form-control @error('content') is-invalid @enderror" 
-                                  id="content" name="content" rows="15">{{ old('content') }}</textarea>
-                        @error('content')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="avatar" class="form-label">Foto Profil</label>
-                        <input type="file" class="form-control @error('avatar') is-invalid @enderror" 
-                               id="avatar" name="avatar" accept="image/*">
+                        <label for="photo" class="form-label">Foto Profil</label>
+                        <input type="file" class="form-control @error('photo') is-invalid @enderror" 
+                               id="photo" name="photo" accept="image/*">
                         <div class="form-text">Format yang didukung: JPG, PNG, GIF, WebP. Maksimal 2MB. Rekomendasi ukuran: 300x300px.</div>
-                        @error('avatar')
+                        @error('photo')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
@@ -97,18 +79,10 @@
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="category" class="form-label">Kategori</label>
-                                <select class="form-control @error('category') is-invalid @enderror" 
-                                        id="category" name="category">
-                                    <option value="student" {{ old('category', 'student') == 'student' ? 'selected' : '' }}>Siswa</option>
-                                    <option value="alumni" {{ old('category') == 'alumni' ? 'selected' : '' }}>Alumni</option>
-                                    <option value="parent" {{ old('category') == 'parent' ? 'selected' : '' }}>Orang Tua</option>
-                                    <option value="teacher" {{ old('category') == 'teacher' ? 'selected' : '' }}>Guru</option>
-                                    <option value="staff" {{ old('category') == 'staff' ? 'selected' : '' }}>Staff</option>
-                                    <option value="community" {{ old('category') == 'community' ? 'selected' : '' }}>Masyarakat</option>
-                                    <option value="partner" {{ old('category') == 'partner' ? 'selected' : '' }}>Mitra</option>
-                                </select>
-                                @error('category')
+                                <label for="order" class="form-label">Urutan</label>
+                                <input type="number" class="form-control @error('order') is-invalid @enderror" 
+                                       id="order" name="order" value="{{ old('order', 0) }}" min="0">
+                                @error('order')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -130,21 +104,10 @@
                         <div class="col-md-4">
                             <div class="mb-3">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="is_approved" name="is_approved" 
-                                           value="1" {{ old('is_approved', true) ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="is_approved">
-                                        Disetujui
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="mb-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="is_public" name="is_public" 
-                                           value="1" {{ old('is_public', true) ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="is_public">
-                                        Tampilkan Publik
+                                    <input class="form-check-input" type="checkbox" id="is_active" name="is_active" 
+                                           value="1" {{ old('is_active', true) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="is_active">
+                                        Aktif
                                     </label>
                                 </div>
                             </div>
@@ -175,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Console log removed
     
     tinymce.init({
-        selector: '#content',
+        selector: '#testimonial',
         height: 500,
         menubar: true,
         plugins: [

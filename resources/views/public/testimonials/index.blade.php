@@ -58,8 +58,8 @@
                     <div class="card-body p-4 d-flex flex-column">
                         <!-- Testimonial Header -->
                         <div class="d-flex align-items-center mb-3">
-                            @if($testimonial->avatar)
-                                <img src="{{ Storage::url($testimonial->avatar) }}" 
+                            @if($testimonial->photo)
+                                <img src="{{ Storage::url($testimonial->photo) }}" 
                                      alt="{{ $testimonial->name }}" 
                                      class="rounded-circle me-3" 
                                      style="width: 50px; height: 50px; object-fit: cover;">
@@ -77,7 +77,7 @@
                                     <small class="text-muted">{{ $testimonial->position }}</small>
                                 @endif
                             </div>
-                            @if($testimonial->featured)
+                            @if($testimonial->is_featured)
                                 <span class="badge bg-warning">
                                     <i class="bi bi-star-fill me-1"></i>Unggulan
                                 </span>
@@ -103,7 +103,7 @@
                         <!-- Testimonial Content -->
                         <div class="flex-grow-1">
                             <blockquote class="mb-3 testimonial-content" style="font-style: italic; color: var(--section-text-color);">
-                                "{{ $testimonial->content }}"
+                                "{{ $testimonial->testimonial }}"
                             </blockquote>
                         </div>
 

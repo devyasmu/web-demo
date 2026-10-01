@@ -57,9 +57,9 @@
     $quickLinksResolved = $quickLinkList->count() > 0
         ? $quickLinkList->take(5)->map(fn ($link) => [
             'title' => $link->title,
-            'url' => $link->url,
+            'url' => $link->resolved_url,
             'icon' => $link->icon ?: 'bi bi-link-45deg',
-            'external' => true,
+            'external' => $link->is_external,
         ])
         : collect([
             ['title' => 'Program', 'url' => route('programs.index'), 'icon' => 'bi bi-journal-richtext', 'external' => false],

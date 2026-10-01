@@ -40,6 +40,9 @@ use App\Http\Controllers\PageController;
 
 // Public Routes
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/bit.ly/{code}', fn (string $code) => redirect()->away('https://bit.ly/' . $code))
+    ->where('code', '.*')
+    ->name('external.bitly');
 
 // Test TinyMCE (no auth required)
 Route::get('/test-tinymce', function() {
