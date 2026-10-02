@@ -32,9 +32,9 @@ class HomeController extends Controller
             // Paginated sections
             $featuredPosts = Post::published()->featured()->with('category')->latest()->paginate(6, ['*'], 'posts_page');
             $recentPosts = Post::published()->with('category')->latest()->paginate(4, ['*'], 'recent_page');
-            $featuredPrograms = Program::active()->featured()->ordered()->paginate(6, ['*'], 'programs_page');
+            $featuredPrograms = Program::active()->ordered()->paginate(6, ['*'], 'programs_page');
             $announcements = Announcement::active()->current()->latest()->paginate(5, ['*'], 'announcements_page');
-            $testimonials = Testimonial::active()->featured()->ordered()->paginate(6, ['*'], 'testimonials_page');
+            $testimonials = Testimonial::active()->ordered()->paginate(6, ['*'], 'testimonials_page');
             
             // New sections
             $statistics = Statistic::active()->ordered()->get();

@@ -193,7 +193,7 @@
     <div class="home-wrap">
         <div class="home-section-head">
             <div>
-                <div class="home-section-label">Program Unggulan</div>
+                <div class="home-section-label">Program</div>
                 <h2>Ruang belajar yang terlihat, bukan sekadar daftar.</h2>
             </div>
             <a class="home-btn home-btn-gold" href="{{ route('programs.index') }}">Semua Program</a>

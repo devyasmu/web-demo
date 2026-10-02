@@ -61,7 +61,7 @@
                                  alt="{{ $program->title }}" 
                                  class="card-img-top h-100 object-cover">
                             <div class="position-absolute top-0 end-0 m-2">
-                                @if($program->featured)
+                                @if($program->is_featured)
                                     <span class="badge bg-warning">
                                         <i class="bi bi-star-fill me-1"></i>Unggulan
                                     </span>
@@ -71,9 +71,11 @@
                     @endif
                     
                     <div class="card-body d-flex flex-column">
-                        <div class="mb-2">
-                            <span class="badge bg-primary">{{ $program->category }}</span>
-                        </div>
+                        @if($program->duration)
+                            <div class="mb-2">
+                                <span class="badge bg-primary">{{ $program->duration }}</span>
+                            </div>
+                        @endif
                         
                         <h5 class="card-title fw-bold mb-3">
                             <a href="{{ route('programs.show', $program->slug) }}" 
@@ -83,9 +85,9 @@
                             </a>
                         </h5>
                         
-                        @if($program->description)
+                        @if($program->excerpt)
                             <p class="card-text text-muted flex-grow-1 public-readable-text">
-                                {{ Str::limit($program->description, 120) }}
+                                {{ Str::limit($program->excerpt, 120) }}
                             </p>
                         @endif
                         

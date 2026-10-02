@@ -34,8 +34,10 @@
                 <div class="card-body p-4">
                     <!-- Program Meta -->
                     <div class="d-flex flex-wrap align-items-center mb-3">
-                        <span class="badge bg-primary me-2 mb-2">{{ $program->category }}</span>
-                        @if($program->featured)
+                        @if($program->duration)
+                            <span class="badge bg-primary me-2 mb-2">{{ $program->duration }}</span>
+                        @endif
+                        @if($program->is_featured)
                             <span class="badge bg-warning me-2 mb-2">
                                 <i class="bi bi-star-fill me-1"></i>Program Unggulan
                             </span>
@@ -48,10 +50,10 @@
                     </h1>
 
                     <!-- Program Description -->
-                    @if($program->description)
+                    @if($program->excerpt)
                         <div class="mb-4">
                             <h5 style="color: var(--primary-color);">Deskripsi Program</h5>
-                            <p class="lead public-readable-text">{{ $program->description }}</p>
+                            <p class="lead public-readable-text">{{ $program->excerpt }}</p>
                         </div>
                     @endif
 
