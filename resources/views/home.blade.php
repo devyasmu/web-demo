@@ -277,7 +277,7 @@
         <div class="home-voice-list">
             @foreach($testimonialList->take(2) as $testimonial)
             <figure>
-                <blockquote>{{ $testimonial->testimonial }}</blockquote>
+                <blockquote>{{ trim(strip_tags($testimonial->testimonial)) }}</blockquote>
                 <figcaption>
                     @if($testimonial->photo)
                         <img src="{{ asset('storage/' . $testimonial->photo) }}" alt="{{ $testimonial->name }}">
@@ -902,6 +902,10 @@ body {
 .home-voice-list blockquote {
     line-height: 1.8;
     margin: 0 0 24px;
+}
+
+.home-voice-list blockquote p {
+    margin-bottom: 0;
 }
 
 .home-voice-list figcaption {

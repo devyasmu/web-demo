@@ -103,7 +103,7 @@
                         <!-- Testimonial Content -->
                         <div class="flex-grow-1">
                             <blockquote class="mb-3 testimonial-content" style="font-style: italic; color: var(--section-text-color);">
-                                "{{ $testimonial->testimonial }}"
+                                {{ trim(strip_tags($testimonial->testimonial)) }}
                             </blockquote>
                         </div>
 
@@ -166,6 +166,10 @@ blockquote {
     padding: 1rem;
     border-radius: 5px;
     margin: 0;
+}
+
+blockquote p {
+    margin-bottom: 0;
 }
 
 .pagination .page-link {
