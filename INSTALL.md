@@ -113,6 +113,25 @@ Setelah mengubah `.env`, jalankan `php artisan optimize:clear`.
 - **SSL/TLS → Edge Certificates**: aktifkan *Always Use HTTPS*.
 - **Security → Bots**: aktifkan *Bot Fight Mode* untuk lapisan anti-spam tambahan.
 
+### Tanpa Cloudflare
+
+Perlindungan anti-spam ada di dalam aplikasi, jadi tetap aktif penuh tanpa Cloudflare. Untuk hosting biasa tanpa proxy, cukup kosongkan `TRUSTED_PROXIES`. Itu juga nilai bawaannya.
+
+Yang tidak ada tanpa Cloudflare hanyalah lapisan di luar aplikasi: perlindungan DDoS, pemblokiran bot sebelum sampai ke server, dan firewall (WAF). Penggantinya bisa berupa:
+
+- **aaPanel**: plugin firewall Nginx dari App Store.
+- **cPanel**: pastikan ModSecurity atau Imunify360 dari hosting aktif.
+- **VPS**: pasang `fail2ban`.
+- Atau gunakan Cloudflare paket gratis.
+
+### Kesalahan yang perlu dihindari
+
+| Kesalahan | Akibat |
+|---|---|
+| Pakai Cloudflare, tetapi `TRUSTED_PROXIES` kosong | Semua pengunjung terbaca dengan IP Cloudflare yang sama, sehingga satu spammer bisa membuat pengunjung lain terblokir ("Too Many Requests"). |
+| Tidak pakai Cloudflare, tetapi diisi `cloudflare` | Tidak berbahaya, tidak ada efeknya. |
+| Diisi `*` padahal server bisa diakses langsung | Penyerang bisa memalsukan IP dan lolos dari pembatasan spam. |
+
 ### Header wajib di reverse proxy
 
 Reverse proxy harus meneruskan header berikut ke aplikasi. Contoh untuk Nginx:
