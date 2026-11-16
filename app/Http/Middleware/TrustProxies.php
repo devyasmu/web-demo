@@ -8,7 +8,9 @@ use Illuminate\Http\Request;
 class TrustProxies extends Middleware
 {
     /**
-     * The trusted proxies for this application.
+     * Sengaja dikosongkan: daftar proxy diambil dari config/trustedproxy.php
+     * (diatur lewat TRUSTED_PROXIES di .env) supaya tiap instalasi bisa
+     * menyesuaikan tanpa mengubah kode.
      *
      * @var array<int, string>|string|null
      */

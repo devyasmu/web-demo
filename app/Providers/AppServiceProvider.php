@@ -20,7 +20,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        if (! $this->app->isLocal()) {
+        // FORCE_HTTPS di .env; bawaan: aktif di semua environment selain local.
+        // Set false hanya jika domain belum punya SSL.
+        if (config('app.force_https')) {
             URL::forceScheme('https');
         }
     }

@@ -57,6 +57,9 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    // Paksa semua URL memakai https. Bawaan: aktif kecuali APP_ENV=local.
+    'force_https' => (bool) env('FORCE_HTTPS', env('APP_ENV', 'production') !== 'local'),
+
     'asset_url' => env('ASSET_URL'),
 
     /*
