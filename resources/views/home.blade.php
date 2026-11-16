@@ -98,7 +98,8 @@
 
 <section class="home-hero" data-home-hero>
     <div class="home-hero-media">
-        <img data-hero-image src="{{ $heroImage }}" alt="{{ $heroHeadline }}" @unless($heroImage) hidden @endunless>
+        {{-- Gambar dekoratif: judul sudah tampil di <h1>. Disembunyikan jika file gagal dimuat agar tidak muncul teks/ikon rusak. --}}
+        <img data-hero-image src="{{ $heroImage }}" alt="" onerror="this.hidden = true" @unless($heroImage) hidden @endunless>
     </div>
     <div class="home-wrap">
         <div class="home-hero-grid">
@@ -415,6 +416,11 @@ body {
     display: block;
     filter: saturate(1.08) contrast(1.02);
     transition: opacity 0.48s ease, transform 0.48s ease;
+}
+
+/* display:block di atas mengalahkan atribut hidden bawaan browser */
+.home-hero-media img[hidden] {
+    display: none;
 }
 
 .home-hero-media::after {
@@ -1223,12 +1229,16 @@ document.addEventListener('DOMContentLoaded', () => {
     let activeIndex = 0;
     let timer = null;
 
+    // Gambar yang gagal dimuat dicatat supaya slide tersebut tampil tanpa gambar.
+    const brokenImages = new Set();
+
     heroSlides.forEach((slide) => {
         if (!slide.image) {
             return;
         }
 
         const preload = new Image();
+        preload.onerror = () => brokenImages.add(slide.image);
         preload.src = slide.image;
     });
 
@@ -1241,14 +1251,12 @@ document.addEventListener('DOMContentLoaded', () => {
             primary.href = slide.buttonLink;
             buttonText.textContent = slide.buttonText;
 
-            if (slide.image) {
+            if (slide.image && !brokenImages.has(slide.image)) {
                 image.hidden = false;
                 image.src = slide.image;
-                image.alt = slide.headline;
             } else {
                 image.hidden = true;
                 image.removeAttribute('src');
-                image.alt = '';
             }
 
             window.setTimeout(() => hero.classList.remove('is-changing'), 80);
