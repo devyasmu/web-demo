@@ -44,12 +44,6 @@ Route::get('/bit.ly/{code}', fn (string $code) => redirect()->away('https://bit.
     ->where('code', '.*')
     ->name('external.bitly');
 
-// Test TinyMCE (no auth required)
-Route::get('/test-tinymce', function() {
-    return view('admin.posts.test-create');
-})->name('test-tinymce');
-
-
 // Posts Routes
 Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
 Route::get('/posts/{slug}', [PostController::class, 'show'])->name('posts.show');
@@ -120,11 +114,6 @@ Route::prefix('admin')->middleware(['admin.hidden', 'auth'])->group(function () 
     
     // Image Upload
     Route::post('upload-image', [App\Http\Controllers\Admin\ImageUploadController::class, 'upload'])->name('upload-image');
-    
-    // Test TinyMCE
-    Route::get('posts/test-create', function() {
-        return view('admin.posts.test-create');
-    })->name('posts.test-create');
     
     // Sliders
     Route::resource('sliders', SliderController::class)->names([
