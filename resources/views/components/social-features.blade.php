@@ -82,6 +82,7 @@
             <!-- Comment Form -->
             <form id="commentForm" class="mb-4">
                 @csrf
+                @include('partials.spam-guard', ['formId' => 'comment'])
                 <div class="mb-3">
                     <label for="commenter_name" class="form-label">Nama *</label>
                     <input type="text" class="form-control" id="commenter_name" name="name" required>
@@ -272,19 +273,11 @@ document.addEventListener('DOMContentLoaded', function() {
             submitBtn.innerHTML = '<i class="bi bi-hourglass-split me-1"></i>Mengirim...';
             submitBtn.disabled = true;
             
-            // Make API call
-            console.log('Submitting comment...', {
-                item_type: '{{ $itemType }}',
-                item_id: itemId,
-                name: formData.get('name'),
-                email: formData.get('email'),
-                content: formData.get('content')
-            });
-            
             fetch('{{ route("social.comment") }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                 },
                 body: JSON.stringify({
@@ -292,15 +285,23 @@ document.addEventListener('DOMContentLoaded', function() {
                     item_id: itemId,
                     name: formData.get('name'),
                     email: formData.get('email'),
-                    content: formData.get('content')
+                    content: formData.get('content'),
+                    {{ \App\Support\SpamGuard::HONEYPOT_FIELD }}: formData.get('{{ \App\Support\SpamGuard::HONEYPOT_FIELD }}'),
+                    {{ \App\Support\SpamGuard::TIMESTAMP_FIELD }}: formData.get('{{ \App\Support\SpamGuard::TIMESTAMP_FIELD }}')
                 })
             })
             .then(response => {
-                console.log('Response status:', response.status);
-                return response.json();
+                if (response.status === 429) {
+                    return { success: false, message: 'Terlalu banyak komentar. Tunggu beberapa saat lalu coba lagi.' };
+                }
+                return response.json().then(data => {
+                    if (!data.success && data.errors) {
+                        data.message = Object.values(data.errors).flat()[0];
+                    }
+                    return data;
+                });
             })
             .then(data => {
-                console.log('Response data:', data);
                 if (data.success) {
                     // Reset form
                     this.reset();
@@ -353,13 +354,20 @@ function addCommentToList(comment) {
     // Create comment element
     const commentElement = document.createElement('div');
     commentElement.className = 'comment-item mb-3 p-3 border rounded';
-    commentElement.innerHTML = `
-        <div class="d-flex justify-content-between align-items-start mb-2">
-            <h6 class="mb-0 fw-bold">${comment.name}</h6>
-            <small class="text-muted">${formatDate(comment.created_at)}</small>
-        </div>
-        <p class="mb-0">${comment.content}</p>
-    `;
+    // Pakai textContent, bukan innerHTML, agar isi komentar tidak bisa menjalankan skrip.
+    const header = document.createElement('div');
+    header.className = 'd-flex justify-content-between align-items-start mb-2';
+    const nameEl = document.createElement('h6');
+    nameEl.className = 'mb-0 fw-bold';
+    nameEl.textContent = comment.name;
+    const dateEl = document.createElement('small');
+    dateEl.className = 'text-muted';
+    dateEl.textContent = formatDate(comment.created_at);
+    header.append(nameEl, dateEl);
+    const body = document.createElement('p');
+    body.className = 'mb-0';
+    body.textContent = comment.content;
+    commentElement.append(header, body);
     
     // Add to top of comments list
     commentsList.insertBefore(commentElement, commentsList.firstChild);
@@ -395,10 +403,12 @@ function showAlert(message, type) {
     const alertDiv = document.createElement('div');
     alertDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
     alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-    alertDiv.innerHTML = `
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
+    alertDiv.textContent = message;
+    const closeBtn = document.createElement('button');
+    closeBtn.type = 'button';
+    closeBtn.className = 'btn-close';
+    closeBtn.setAttribute('data-bs-dismiss', 'alert');
+    alertDiv.appendChild(closeBtn);
     
     document.body.appendChild(alertDiv);
     

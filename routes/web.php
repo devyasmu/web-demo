@@ -54,7 +54,7 @@ Route::get('/galleries/{slug}', [GalleryController::class, 'show'])->name('galle
 
 // Contact Routes
 Route::get('/contacts', [ContactController::class, 'index'])->name('contacts.index');
-Route::post('/contacts', [ContactController::class, 'store'])->name('contacts.store');
+Route::post('/contacts', [ContactController::class, 'store'])->middleware('throttle:contact')->name('contacts.store');
 
 // FAQ Routes
 Route::get('/faqs', [FaqController::class, 'index'])->name('faqs.index');
@@ -318,10 +318,10 @@ Route::prefix('admin')->middleware(['admin.hidden', 'auth'])->group(function () 
 
 // Social Features Routes
 Route::prefix('api/social')->group(function () {
-    Route::post('/like', [App\Http\Controllers\SocialController::class, 'toggleLike'])->name('social.like');
-    Route::post('/comment', [App\Http\Controllers\SocialController::class, 'storeComment'])->name('social.comment');
-    Route::get('/comments', [App\Http\Controllers\SocialController::class, 'getComments'])->name('social.comments');
-    Route::get('/check-like', [App\Http\Controllers\SocialController::class, 'checkLike'])->name('social.check-like');
+    Route::post('/like', [App\Http\Controllers\SocialController::class, 'toggleLike'])->middleware('throttle:likes')->name('social.like');
+    Route::post('/comment', [App\Http\Controllers\SocialController::class, 'storeComment'])->middleware('throttle:comments')->name('social.comment');
+    Route::get('/comments', [App\Http\Controllers\SocialController::class, 'getComments'])->middleware('throttle:social-read')->name('social.comments');
+    Route::get('/check-like', [App\Http\Controllers\SocialController::class, 'checkLike'])->middleware('throttle:social-read')->name('social.check-like');
 });
 
 // Static Pages Routes (must be last to avoid conflicts)

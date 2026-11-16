@@ -6,9 +6,19 @@ use App\Models\Like;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
+use App\Support\SpamGuard;
 
 class SocialController extends Controller
 {
+    private const LIKEABLE_TYPES = [
+        'post' => \App\Models\Post::class,
+        'announcement' => \App\Models\Announcement::class,
+        'program' => \App\Models\Program::class,
+        'gallery' => \App\Models\Gallery::class,
+    ];
+
     /**
      * Toggle like for a post/announcement
      */
@@ -16,11 +26,16 @@ class SocialController extends Controller
     {
         $request->validate([
             'item_type' => 'required|string|in:post,announcement,program,gallery',
-            'item_id' => 'required|integer',
+            'item_id' => 'required|integer|min:1',
         ]);
 
+        $modelClass = self::LIKEABLE_TYPES[$request->item_type];
+        if (!$modelClass::whereKey($request->item_id)->exists()) {
+            return response()->json(['success' => false, 'message' => 'Konten tidak ditemukan.'], 404);
+        }
+
         $userIp = $request->ip();
-        $userAgent = $request->userAgent();
+        $userAgent = mb_substr((string) $request->userAgent(), 0, 255);
 
         $isLiked = Like::toggleLike(
             $request->item_type,
@@ -43,51 +58,71 @@ class SocialController extends Controller
     }
 
     /**
+     * Tipe item yang boleh dikomentari (dikirim dari form sebagai nama class).
+     */
+    private const COMMENTABLE_TYPES = [
+        'App\\Models\\Post' => \App\Models\Post::class,
+        'App\\Models\\Announcement' => \App\Models\Announcement::class,
+        'App\\Models\\Program' => \App\Models\Program::class,
+        'App\\Models\\Gallery' => \App\Models\Gallery::class,
+    ];
+
+    /**
      * Store a new comment
      */
     public function storeComment(Request $request): JsonResponse
     {
-        \Log::info('Comment submission attempt', [
-            'request_data' => $request->all(),
-            'ip' => $request->ip(),
-            'user_agent' => $request->userAgent()
-        ]);
-
         $request->validate([
-            'item_type' => 'required|string|in:App\Models\Post,App\Models\Announcement,App\Models\Program,App\Models\Gallery',
-            'item_id' => 'required|integer',
-            'name' => 'required|string|max:255',
+            'item_type' => ['required', 'string', Rule::in(array_keys(self::COMMENTABLE_TYPES))],
+            'item_id' => 'required|integer|min:1',
+            'name' => ['required', 'string', 'min:2', 'max:100', 'not_regex:~(https?://|www\.|<|>)~i'],
             'email' => 'required|email|max:255',
-            'content' => 'required|string|max:1000',
+            'content' => 'required|string|min:3|max:1000',
         ]);
 
-        $comment = Comment::create([
+        $spamReason = SpamGuard::check($request, ['name', 'content']);
+        if ($spamReason === 'honeypot') {
+            // Bot: pura-pura berhasil supaya tidak mencoba cara lain, tapi tidak disimpan.
+            Log::notice('Comment blocked', ['reason' => $spamReason, 'ip' => $request->ip()]);
+            return response()->json(['success' => true, 'message' => 'Komentar berhasil dikirim!']);
+        }
+        if ($spamReason !== null) {
+            Log::notice('Comment blocked', ['reason' => $spamReason, 'ip' => $request->ip()]);
+            return response()->json([
+                'success' => false,
+                'message' => in_array($spamReason, ['too_many_links', 'blocked_word'], true)
+                    ? 'Komentar ditolak karena terdeteksi sebagai spam.'
+                    : 'Sesi formulir tidak valid. Muat ulang halaman lalu coba lagi.',
+            ], 422);
+        }
+
+        $modelClass = self::COMMENTABLE_TYPES[$request->item_type];
+        if (!$modelClass::whereKey($request->item_id)->exists()) {
+            return response()->json(['success' => false, 'message' => 'Konten tidak ditemukan.'], 404);
+        }
+
+        $content = trim(strip_tags($request->content));
+        $isDuplicate = Comment::where('user_ip', $request->ip())
+            ->where('content', $content)
+            ->where('created_at', '>=', now()->subDay())
+            ->exists();
+        if ($isDuplicate) {
+            return response()->json(['success' => false, 'message' => 'Komentar yang sama sudah pernah dikirim.'], 422);
+        }
+
+        Comment::create([
             'commentable_type' => $request->item_type,
             'commentable_id' => $request->item_id,
-            'name' => $request->name,
+            'name' => trim(strip_tags($request->name)),
             'email' => $request->email,
-            'content' => $request->content,
+            'content' => $content,
             'user_ip' => $request->ip(),
-            'user_agent' => $request->userAgent(),
+            'user_agent' => mb_substr((string) $request->userAgent(), 0, 255),
             'is_approved' => false, // Require admin approval
         ]);
 
-        // Get updated comments count
-        $commentsCount = Comment::where('commentable_type', $request->item_type)
-                               ->where('commentable_id', $request->item_id)
-                               ->where('is_approved', true)
-                               ->count();
-
         return response()->json([
             'success' => true,
-            'comment' => [
-                'id' => $comment->id,
-                'name' => $comment->name,
-                'email' => $comment->email,
-                'content' => $comment->content,
-                'created_at' => $comment->created_at->toISOString(),
-            ],
-            'comments_count' => $commentsCount,
             'message' => 'Komentar berhasil dikirim!'
         ]);
     }

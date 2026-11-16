@@ -29,6 +29,29 @@ class RouteServiceProvider extends ServiceProvider
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
 
+        // Form publik: batasi per IP agar bot tidak bisa membanjiri komentar/kontak.
+        RateLimiter::for('comments', function (Request $request) {
+            return [
+                Limit::perMinute(3)->by('comments-min:' . $request->ip()),
+                Limit::perDay(20)->by('comments-day:' . $request->ip()),
+            ];
+        });
+
+        RateLimiter::for('contact', function (Request $request) {
+            return [
+                Limit::perMinute(2)->by('contact-min:' . $request->ip()),
+                Limit::perDay(10)->by('contact-day:' . $request->ip()),
+            ];
+        });
+
+        RateLimiter::for('likes', function (Request $request) {
+            return Limit::perMinute(30)->by('likes:' . $request->ip());
+        });
+
+        RateLimiter::for('social-read', function (Request $request) {
+            return Limit::perMinute(120)->by('social-read:' . $request->ip());
+        });
+
         $this->routes(function () {
             Route::middleware('api')
                 ->prefix('api')

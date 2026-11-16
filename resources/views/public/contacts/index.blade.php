@@ -50,6 +50,7 @@
 
                     <form method="POST" action="{{ route('contacts.store') }}">
                         @csrf
+                        @include('partials.spam-guard', ['formId' => 'contact'])
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">

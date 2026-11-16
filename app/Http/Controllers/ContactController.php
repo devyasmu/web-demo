@@ -23,7 +23,7 @@ class ContactController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'phone' => 'nullable|string|max:20',
@@ -31,7 +31,7 @@ class ContactController extends Controller
             'message' => 'required|string|max:2000',
         ]);
 
-        $contact = Contact::create($request->all());
+        $contact = Contact::create($validated);
 
         // Send email notification to admin (optional)
         try {

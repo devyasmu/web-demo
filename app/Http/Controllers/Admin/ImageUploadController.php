@@ -13,12 +13,14 @@ class ImageUploadController extends Controller
     public function upload(Request $request)
     {
         $request->validate([
-            'file' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:5120' // 5MB max
+            // SVG sengaja tidak diizinkan: file SVG bisa membawa JavaScript (stored XSS).
+            'file' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120' // 5MB max
         ]);
 
         try {
             $file = $request->file('file');
-            $filename = Str::random(20) . '.' . $file->getClientOriginalExtension();
+            // Ekstensi dari isi file (hasil deteksi MIME), bukan dari nama file kiriman.
+            $filename = Str::random(20) . '.' . $file->guessExtension();
             
             // Store original image
             $path = $file->storeAs('uploads/images', $filename, 'public');
@@ -48,9 +50,11 @@ class ImageUploadController extends Controller
             ]);
             
         } catch (\Exception $e) {
+            report($e);
+
             return response()->json([
                 'success' => false,
-                'message' => 'Upload failed: ' . $e->getMessage()
+                'message' => 'Upload gagal. Silakan coba lagi.'
             ], 500);
         }
     }
