@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
             SiteSettingSeeder::class,
             CategorySeeder::class,
             MenuSeeder::class,
-            SampleDataSeeder::class,
+            DemoContentSeeder::class,
         ]);
     }
 }

@@ -153,6 +153,33 @@ Aktifkan SSL untuk domain, misalnya Let's Encrypt di aaPanel atau cPanel. Aplika
 2. **Segera ganti password admin bawaan** (`admin@webdemo.test` / `password`) dan email admin.
 3. Ubah identitas situs di menu **Site Settings**.
 
+## Data contoh (dummy)
+
+Instalasi baru (`php artisan db:seed --force` di langkah 2) sudah otomatis terisi data contoh: slider, berita, program, galeri, pengumuman, file download (PDF), testimoni, FAQ, statistik, dan satu halaman contoh di `/contoh-profil-sekolah`. Semua dilengkapi gambar ilustrasi, dan setiap artikel diberi catatan bahwa isinya hanya contoh. Data ini membantu admin melihat bentuk setiap menu sebelum mengisi data asli.
+
+Gambar dan PDF-nya disimpan di repo (`database/seeders/demo-assets/`), lalu disalin ke `storage/app/public/demo/` saat seeder dijalankan.
+
+**Menambahkan data contoh ke situs yang sudah berjalan:**
+
+```bash
+php artisan db:seed --class=DemoContentSeeder --force
+chown -R www:www storage    # sesuaikan user web server
+```
+
+- Aman dijalankan berulang kali. Data tidak akan dobel.
+- Tidak mengubah akun admin maupun Site Settings.
+- Data lama yang gambarnya hilang akan diberi gambar contoh.
+
+> **Jangan** menjalankan `php artisan db:seed --force` tanpa `--class` di situs yang sudah berjalan. Perintah itu juga menjalankan `UserSeeder`, yang mengembalikan password admin ke `password`.
+
+**Menghapus semua data contoh** setelah data asli siap:
+
+```bash
+php artisan db:seed --class=DemoContentCleanupSeeder --force
+```
+
+Perintah ini menghapus data contoh beserta komentar, like, gambar, dan PDF-nya. Data yang gambarnya sudah diganti admin tidak ikut terhapus. Kategori dan menu juga tetap ada.
+
 ## Perlindungan spam yang sudah aktif
 
 - Komentar: maksimal 3 per menit dan 20 per hari per IP, dan wajib disetujui admin sebelum tampil.
