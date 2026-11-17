@@ -55,6 +55,31 @@
             margin-right: 0.5rem;
             width: 20px;
         }
+        /* Layar kecil: sidebar melayang dari kiri, dibuka lewat tombol menu di header */
+        .admin-sidebar-backdrop { display: none; }
+        @media (max-width: 767.98px) {
+            .admin-sidebar {
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                width: min(280px, 85vw);
+                min-height: 0;
+                z-index: 1045;
+                overflow-y: auto;
+                box-shadow: 0 0 24px rgba(0, 0, 0, .25);
+            }
+            .admin-sidebar .position-sticky { position: static !important; }
+            .admin-sidebar-close { position: absolute; top: .75rem; right: .75rem; z-index: 1; }
+            .admin-sidebar-backdrop.show {
+                display: block;
+                position: fixed;
+                inset: 0;
+                z-index: 1040;
+                background: rgba(0, 0, 0, .45);
+            }
+            .admin-header h1 { font-size: 1.35rem; }
+        }
         .main-content {
             background-color: #f8f9fa;
             min-height: 100vh;
@@ -91,8 +116,11 @@
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
-            <nav class="col-md-3 col-lg-2 d-md-block sidebar admin-sidebar collapse">
+            <nav id="adminSidebar" class="col-md-3 col-lg-2 d-md-block sidebar admin-sidebar collapse" aria-label="Menu admin">
                 <div class="position-sticky pt-3">
+                    <button type="button" class="btn btn-sm btn-light d-md-none admin-sidebar-close" data-admin-sidebar-close aria-label="Tutup menu">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
                     <div class="text-center mb-4">
                         @php
                             $siteSettings = \App\Models\SiteSetting::first();
@@ -289,6 +317,10 @@
                 <!-- Top navbar -->
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom admin-header">
                     <div class="d-flex align-items-center">
+                        <button type="button" class="btn btn-outline-secondary d-md-none me-2 admin-sidebar-toggle"
+                                data-admin-sidebar-toggle aria-controls="adminSidebar" aria-expanded="false" aria-label="Buka menu">
+                            <i class="bi bi-list fs-5"></i>
+                        </button>
                         @php
                             $siteSettings = \App\Models\SiteSetting::first();
                         @endphp
@@ -351,6 +383,42 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <div class="admin-sidebar-backdrop" id="adminSidebarBackdrop"></div>
+    <script>
+    // Menu admin di layar kecil. Sengaja tanpa data-bs-toggle: Bootstrap dimuat dua kali
+    // (Vite + CDN), sehingga data-api akan membuka lalu langsung menutup lagi.
+    document.addEventListener('DOMContentLoaded', function () {
+        var sidebar = document.getElementById('adminSidebar');
+        var backdrop = document.getElementById('adminSidebarBackdrop');
+        var toggles = document.querySelectorAll('[data-admin-sidebar-toggle]');
+        if (!sidebar) return;
+        var isMobile = function () { return window.matchMedia('(max-width: 767.98px)').matches; };
+
+        function setOpen(open) {
+            sidebar.classList.toggle('show', open);
+            backdrop.classList.toggle('show', open);
+            document.body.style.overflow = open ? 'hidden' : '';
+            toggles.forEach(function (btn) { btn.setAttribute('aria-expanded', open ? 'true' : 'false'); });
+        }
+
+        toggles.forEach(function (btn) {
+            btn.addEventListener('click', function () { setOpen(!sidebar.classList.contains('show')); });
+        });
+        backdrop.addEventListener('click', function () { setOpen(false); });
+        document.querySelectorAll('[data-admin-sidebar-close]').forEach(function (btn) {
+            btn.addEventListener('click', function () { setOpen(false); });
+        });
+        sidebar.querySelectorAll('.nav-link').forEach(function (link) {
+            link.addEventListener('click', function () { if (isMobile()) setOpen(false); });
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && sidebar.classList.contains('show')) setOpen(false);
+        });
+        window.addEventListener('resize', function () {
+            if (!isMobile() && sidebar.classList.contains('show')) setOpen(false);
+        });
+    });
+    </script>
     
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
