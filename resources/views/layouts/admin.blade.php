@@ -100,7 +100,7 @@
                         @if($siteSettings && $siteSettings->logo)
                             <div class="mb-3">
                                 <img src="{{ asset('storage/' . $siteSettings->logo) }}" alt="{{ $siteSettings->site_name }}" 
-                                     class="img-fluid" style="max-height: 60px; max-width: 150px;">
+                                     class="img-fluid" style="max-height: 60px; max-width: 150px;" onerror="this.parentElement.remove()">
                             </div>
                         @endif
                         <h4 class="text-white">
@@ -294,7 +294,7 @@
                         @endphp
                         @if($siteSettings && $siteSettings->logo)
                             <img src="{{ asset('storage/' . $siteSettings->logo) }}" alt="{{ $siteSettings->site_name }}" 
-                                 class="me-3" style="max-height: 40px; max-width: 120px;">
+                                 class="me-3" style="max-height: 40px; max-width: 120px;" onerror="this.remove()">
                         @endif
                         <h1 class="h2 mb-0">@yield('page-title', 'Dashboard')</h1>
                     </div>

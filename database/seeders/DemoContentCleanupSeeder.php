@@ -15,6 +15,7 @@ use App\Models\Post;
 use App\Models\Program;
 use App\Models\QuickLink;
 use App\Models\RunningText;
+use App\Models\SiteSetting;
 use App\Models\Slider;
 use App\Models\Statistic;
 use App\Models\Testimonial;
@@ -74,6 +75,17 @@ class DemoContentCleanupSeeder extends Seeder
         $deleted += Statistic::query()->whereIn('title', array_column(DemoContentSeeder::statistics(), 'title'))->delete();
         $deleted += InstitutionContact::query()->whereIn('name', array_column(DemoContentSeeder::institutionContacts(), 'name'))->delete();
         $deleted += Page::query()->where('slug', DemoContentSeeder::PAGE_SLUG)->delete();
+
+        // Logo/favicon contoh ikut hilang bersama foldernya; kosongkan agar tidak tampil rusak.
+        $settings = SiteSetting::first();
+        if ($settings) {
+            foreach (['logo', 'favicon'] as $column) {
+                if (str_starts_with((string) $settings->{$column}, DemoContentSeeder::STORAGE_DIR . '/')) {
+                    $settings->{$column} = null;
+                }
+            }
+            $settings->save();
+        }
 
         Storage::disk('public')->deleteDirectory(DemoContentSeeder::STORAGE_DIR);
 
