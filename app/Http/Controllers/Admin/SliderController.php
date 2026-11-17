@@ -47,7 +47,7 @@ class SliderController extends Controller
             'description' => 'nullable|string',
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
             'button_text' => 'nullable|string|max:255',
-            'button_link' => 'nullable|url',
+            'button_link' => ['nullable', 'string', 'max:500', new \App\Rules\SiteLink()],
             'order' => 'nullable|integer',
             'is_active' => 'boolean',
         ]);
@@ -83,7 +83,7 @@ class SliderController extends Controller
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'button_text' => 'nullable|string|max:255',
-            'button_link' => 'nullable|url',
+            'button_link' => ['nullable', 'string', 'max:500', new \App\Rules\SiteLink()],
             'order' => 'nullable|integer',
             'is_active' => 'boolean',
         ]);

@@ -25,8 +25,9 @@
 
                     <div class="mb-3">
                         <label for="link" class="form-label">Link</label>
-                        <input type="url" class="form-control @error('link') is-invalid @enderror" 
-                               id="link" name="link" value="{{ old('link') }}" placeholder="https://example.com">
+                        <input type="text" class="form-control @error('link') is-invalid @enderror" 
+                               id="link" name="link" value="{{ old('link') }}" placeholder="/berita atau https://...">
+                        <div class="form-text">Halaman di website ini: awali dengan <code>/</code> (contoh <code>/berita</code>). Website lain: alamat lengkap <code>https://...</code></div>
                         @error('link')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror

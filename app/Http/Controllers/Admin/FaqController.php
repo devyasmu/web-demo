@@ -3,66 +3,71 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Faq;
 use Illuminate\Http\Request;
 
 class FaqController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $faqs = \App\Models\Faq::orderBy('order')->get();
+        $faqs = Faq::orderBy('order')->get();
+
         return view('admin.faqs.index', compact('faqs'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        return view('admin.faqs.create');
+        return view('admin.faqs.create', ['faq' => new Faq([
+            'is_active' => true,
+            'order' => (int) Faq::max('order') + 1,
+        ])]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        Faq::create($this->validated($request));
+
+        return redirect()->route('admin.faqs.index')
+            ->with('success', 'FAQ berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(Faq $faq)
     {
-        //
+        return redirect()->route('admin.faqs.edit', $faq);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(\App\Models\Faq $faq)
+    public function edit(Faq $faq)
     {
         return view('admin.faqs.edit', compact('faq'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Faq $faq)
     {
-        //
+        $faq->update($this->validated($request));
+
+        return redirect()->route('admin.faqs.index')
+            ->with('success', 'FAQ berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(\App\Models\Faq $faq)
+    public function destroy(Faq $faq)
     {
         $faq->delete();
+
         return redirect()->route('admin.faqs.index')
             ->with('success', 'FAQ berhasil dihapus.');
+    }
+
+    private function validated(Request $request): array
+    {
+        $data = $request->validate([
+            'question' => 'required|string|max:255',
+            'answer' => 'required|string',
+            'order' => 'nullable|integer|min:0',
+        ]);
+
+        $data['order'] = (int) ($data['order'] ?? 0);
+        $data['is_active'] = $request->boolean('is_active');
+
+        return $data;
     }
 }

@@ -31,7 +31,7 @@ class RunningTextController extends Controller
     {
         $request->validate([
             'text' => 'required|string',
-            'link' => 'nullable|url',
+            'link' => ['nullable', 'string', 'max:500', new \App\Rules\SiteLink()],
             'order' => 'nullable|integer',
             'is_active' => 'boolean',
         ]);
@@ -68,7 +68,7 @@ class RunningTextController extends Controller
     {
         $request->validate([
             'text' => 'required|string',
-            'link' => 'nullable|url',
+            'link' => ['nullable', 'string', 'max:500', new \App\Rules\SiteLink()],
             'order' => 'nullable|integer',
             'is_active' => 'boolean',
         ]);

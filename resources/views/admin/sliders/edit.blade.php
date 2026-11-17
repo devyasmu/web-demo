@@ -62,8 +62,9 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="button_link" class="form-label">Link Tombol</label>
-                                <input type="url" class="form-control @error('button_link') is-invalid @enderror" 
-                                       id="button_link" name="button_link" value="{{ old('button_link', $slider->button_link) }}">
+                                <input type="text" class="form-control @error('button_link') is-invalid @enderror" 
+                                       id="button_link" name="button_link" placeholder="/berita atau https://..." value="{{ old('button_link', $slider->button_link) }}">
+                                <div class="form-text">Halaman di website ini: awali dengan <code>/</code> (contoh <code>/berita</code>). Website lain: alamat lengkap <code>https://...</code></div>
                                 @error('button_link')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
