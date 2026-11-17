@@ -4,6 +4,15 @@
 @section('page-title', 'Dashboard')
 
 @section('content')
+<div class="alert alert-primary d-flex flex-wrap align-items-center gap-2 mb-4">
+    <i class="bi bi-journal-text fs-4"></i>
+    <div class="me-auto">
+        <strong>Baru mengelola website ini?</strong>
+        Baca panduan cara mengisi setiap menu, ukuran gambar yang disarankan, dan solusi masalah umum.
+    </div>
+    <a href="{{ route('admin.guide') }}" class="btn btn-primary btn-sm">Buka Panduan</a>
+</div>
+
 <div class="row">
     <!-- Statistics Cards -->
     <div class="col-xl-3 col-md-6 mb-4">

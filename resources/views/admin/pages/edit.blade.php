@@ -11,7 +11,7 @@
                 <h5 class="card-title mb-0">Edit Halaman</h5>
             </div>
             <div class="card-body">
-                <form action="{{ route('admin.pages.update', ['page' => $page->id]) }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('admin.pages.update', ['page' => $page->id]) }}" method="POST">
                     @csrf
                     @method('PUT')
                     
@@ -34,39 +34,17 @@
                         @enderror
                     </div>
 
-                    <div class="mb-3">
-                        <label for="excerpt" class="form-label">Ringkasan Halaman</label>
-                        <textarea class="form-control @error('excerpt') is-invalid @enderror" 
-                                  id="excerpt" name="excerpt" rows="3">{{ old('excerpt', $page->excerpt) }}</textarea>
-                        @error('excerpt')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
 
                     <div class="mb-3">
                         <label for="content" class="form-label">Konten Halaman <span class="text-danger">*</span></label>
                         <textarea class="form-control @error('content') is-invalid @enderror" 
                                   id="content" name="content" rows="15">{{ old('content', $page->content) }}</textarea>
+                        <div class="form-text">Untuk menyisipkan gambar, klik ikon gambar pada toolbar editor.</div>
                         @error('content')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
 
-                    <div class="mb-3">
-                        <label for="featured_image" class="form-label">Gambar Utama</label>
-                        @if($page->featured_image)
-                            <div class="mb-2">
-                                <img src="{{ asset('storage/' . $page->featured_image) }}" alt="{{ $page->title }}" 
-                                     class="img-thumbnail" style="max-width: 200px;">
-                                <p class="text-muted small">Gambar saat ini</p>
-                            </div>
-                        @endif
-                        <input type="file" class="form-control @error('featured_image') is-invalid @enderror" 
-                               id="featured_image" name="featured_image" accept="image/*">
-                        @error('featured_image')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
 
                     <div class="row">
                         <div class="col-md-6">
@@ -93,16 +71,6 @@
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label for="meta_keywords" class="form-label">Meta Keywords (SEO)</label>
-                        <input type="text" class="form-control @error('meta_keywords') is-invalid @enderror" 
-                               id="meta_keywords" name="meta_keywords" value="{{ old('meta_keywords', $page->meta_keywords) }}" 
-                               placeholder="kata kunci 1, kata kunci 2, kata kunci 3">
-                        <div class="form-text">Pisahkan dengan koma. Contoh: yayasan, pendidikan, islam</div>
-                        @error('meta_keywords')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
 
                     <div class="row">
                         <div class="col-md-6">

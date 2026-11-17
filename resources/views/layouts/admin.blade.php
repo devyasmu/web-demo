@@ -119,6 +119,13 @@
                                 Dashboard
                             </a>
                         </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->routeIs('admin.guide') ? 'active' : '' }}" href="{{ route('admin.guide') }}">
+                                <i class="bi bi-journal-text"></i>
+                                Panduan
+                            </a>
+                        </li>
                         
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.site-settings*') ? 'active' : '' }}" href="{{ route('admin.site-settings.index') }}">

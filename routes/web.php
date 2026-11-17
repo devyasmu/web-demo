@@ -103,6 +103,7 @@ Route::post('/logout', [App\Http\Controllers\Auth\LoginController::class, 'logou
 // Admin Routes - guest yang akses /admin dapat 404 (URL login harus diketik manual)
 Route::prefix('admin')->middleware(['admin.hidden', 'auth'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('admin.dashboard');
+    Route::view('panduan', 'admin.guide')->name('admin.guide');
     
     // Site Settings
     Route::resource('site-settings', SiteSettingController::class)->only(['index', 'update'])->names([

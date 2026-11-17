@@ -151,6 +151,32 @@ class AdminContentCrudTest extends TestCase
         }
     }
 
+    public function test_admin_guide_is_reachable_and_every_toc_link_has_a_section(): void
+    {
+        $html = $this->get(route('admin.guide'))->assertOk()->assertSee('Panduan')->getContent();
+
+        preg_match_all('/data-toc-for="([a-z-]+)"/', $html, $links);
+        $this->assertNotEmpty($links[1]);
+        foreach ($links[1] as $id) {
+            $this->assertStringContainsString('<section id="' . $id . '"', $html, "Bagian #{$id} tidak ada.");
+        }
+
+        $this->get(route('admin.dashboard'))->assertOk()->assertSee(route('admin.guide'));
+    }
+
+    public function test_guide_requires_login(): void
+    {
+        auth()->logout();
+        $this->get(route('admin.guide'))->assertNotFound();
+    }
+
+    public function test_page_forms_render(): void
+    {
+        $this->get(route('admin.pages.create'))->assertOk()->assertDontSee('name="featured_image"', false);
+        $page = \App\Models\Page::create(['title' => 'Profil', 'slug' => 'profil', 'content' => '<p>x</p>', 'is_active' => true]);
+        $this->get(route('admin.pages.edit', $page))->assertOk();
+    }
+
     public function test_download_rejects_disallowed_file_types(): void
     {
         Storage::fake('public');
