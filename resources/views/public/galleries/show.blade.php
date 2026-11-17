@@ -38,11 +38,8 @@
                         <h1 class="display-5 fw-bold mb-0" style="color: var(--primary-color);">
                             {{ $gallery->title }}
                         </h1>
-                        @php($imagesColl = isset($images) ? $images : collect([]))
-                        @php($containsHero = $heroImage ? $imagesColl->contains($heroImage) : false)
-                        @php($imageCount = $imagesColl->count() + (($heroImage && !$containsHero) ? 1 : 0))
                         <span class="badge bg-primary fs-6">
-                            <i class="bi bi-images me-1"></i>{{ $imageCount }} foto
+                            <i class="bi bi-images me-1"></i>{{ $gallery->photo_count }} foto
                         </span>
                     </div>
 
@@ -134,9 +131,7 @@
                                              class="card-img-top h-100 object-cover">
                                         <div class="position-absolute top-0 end-0 m-2">
                                             <span class="badge bg-dark bg-opacity-75">
-                                                @php($relatedCount = ($relatedGallery->images_count ?? null))
-                                                @php($relatedCount = $relatedCount ?: ($relatedHero ? 1 : 0))
-                                                <i class="bi bi-images me-1"></i>{{ $relatedCount }}
+                                                <i class="bi bi-images me-1"></i>{{ $relatedGallery->photo_count }}
                                             </span>
                                         </div>
                                     </div>

@@ -57,10 +57,7 @@
                                  class="card-img-top h-100 object-cover">
                             <div class="position-absolute top-0 end-0 m-2">
                                 <span class="badge bg-dark bg-opacity-75">
-                                    @php($imgs = is_array($gallery->images ?? null) ? $gallery->images : [])
-                                    @php($containsHero = $cardImage ? in_array($cardImage, $imgs, true) : false)
-                                    @php($count = count($imgs) + (($cardImage && !$containsHero) ? 1 : 0))
-                                    <i class="bi bi-images me-1"></i>{{ $count }} foto
+                                    <i class="bi bi-images me-1"></i>{{ $gallery->photo_count }} foto
                                 </span>
                             </div>
                             <div class="position-absolute bottom-0 start-0 end-0 p-3" 

@@ -39,6 +39,20 @@ class Gallery extends Model
         return $this->belongsTo(Category::class);
     }
 
+    /**
+     * Jumlah foto: isi kolom images ditambah foto utama jika belum termasuk.
+     */
+    public function getPhotoCountAttribute(): int
+    {
+        $paths = collect($this->images ?? [])
+            ->map(fn ($image) => is_array($image) ? ($image['image_path'] ?? $image['image'] ?? null) : $image)
+            ->filter();
+
+        $hero = $this->featured_image ?: $this->image;
+
+        return $paths->count() + (($hero && !$paths->contains($hero)) ? 1 : 0);
+    }
+
     public function scopeActive($query)
     {
         return $query->where('is_active', true);
