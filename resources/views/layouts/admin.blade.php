@@ -79,6 +79,18 @@
                 background: rgba(0, 0, 0, .45);
             }
             .admin-header h1 { font-size: 1.35rem; }
+            /* Header (judul + tombol menu) tetap terlihat saat halaman di-scroll */
+            .admin-header {
+                position: sticky;
+                top: 0;
+                z-index: 1030;
+                margin-left: calc(var(--bs-gutter-x, 1.5rem) * -.5);
+                margin-right: calc(var(--bs-gutter-x, 1.5rem) * -.5);
+                padding-left: calc(var(--bs-gutter-x, 1.5rem) * .5);
+                padding-right: calc(var(--bs-gutter-x, 1.5rem) * .5);
+                background-color: #fff;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+            }
         }
         .main-content {
             background-color: #f8f9fa;

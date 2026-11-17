@@ -58,6 +58,29 @@
     .guide-warn { border-left: 4px solid #dc3545; background: #fff5f5; padding: .6rem .9rem; border-radius: .35rem; margin-top: .75rem; }
     .guide-section table { font-size: .92rem; }
     kbd { font-size: .8rem; }
+    .guide-back-to-top {
+        position: fixed;
+        right: 1.25rem;
+        bottom: 1.25rem;
+        z-index: 1035;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, .25);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(10px);
+        transition: opacity .2s ease, transform .2s ease, visibility .2s;
+    }
+    .guide-back-to-top.is-visible { opacity: 1; visibility: visible; transform: none; }
+    @media (max-width: 767.98px) {
+        .guide-section { scroll-margin-top: 5rem; }
+        .guide-back-to-top { right: 1rem; bottom: 1rem; }
+    }
     @media print {
         .admin-sidebar, .guide-no-print, .guide-toc-col, .alert { display: none !important; }
         main.main-content { width: 100% !important; max-width: 100% !important; flex: 0 0 100% !important; margin: 0 !important; padding: 0 !important; }
@@ -444,6 +467,9 @@
         </x-admin.guide-section>
     </div>
 </div>
+<button type="button" class="btn btn-primary guide-back-to-top guide-no-print" id="guideBackToTop" aria-label="Kembali ke atas" title="Kembali ke atas">
+    <i class="bi bi-arrow-up"></i>
+</button>
 @endsection
 
 @push('scripts')
@@ -452,6 +478,18 @@ document.addEventListener('DOMContentLoaded', function () {
     const input = document.getElementById('guideSearch');
     const sections = Array.from(document.querySelectorAll('[data-guide-section]'));
     const noResult = document.getElementById('guideNoResult');
+
+    const backToTop = document.getElementById('guideBackToTop');
+    const toggleBackToTop = function () {
+        backToTop.classList.toggle('is-visible', window.scrollY > 400);
+    };
+    window.addEventListener('scroll', toggleBackToTop, { passive: true });
+    toggleBackToTop();
+    backToTop.addEventListener('click', function () {
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+        backToTop.blur();
+    });
 
     input.addEventListener('input', function () {
         const q = input.value.trim().toLowerCase();
